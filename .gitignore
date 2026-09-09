@@ -1,0 +1,18 @@
+# Local agent execution documents. These are fed to agents manually and are not
+# application source or project documentation intended for the repository.
+/docs/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+.next/
+out/
+coverage/
+
+# Local MinIO state
+minio-data/
+
