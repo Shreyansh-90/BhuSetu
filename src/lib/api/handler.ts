@@ -67,10 +67,18 @@ export function apiHandler(handler: RouteHandlerFn) {
       return response;
     } catch (err) {
       const duration = Date.now() - startTime;
+      
+      const pgCode = err && typeof err === 'object' && 'code' in err ? (err as any).code : undefined;
+      const pgDetail = err && typeof err === 'object' && 'detail' in err ? (err as any).detail : undefined;
+
       logger.error('Unhandled error in route handler.', {
         error: err instanceof Error ? err.message : 'Unknown error',
         stack: err instanceof Error ? err.stack : undefined,
+        pgCode,
+        pgDetail,
         durationMs: duration,
+        path: url.pathname,
+        method: request.method,
       });
 
       return errorResponse(
