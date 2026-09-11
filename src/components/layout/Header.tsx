@@ -33,10 +33,8 @@ export function Header() {
         {/* Mobile Nav */}
         <div className="md:hidden mr-4">
           <Sheet>
-            <SheetTrigger>
-              <Button variant="ghost" size="icon" aria-label="Open menu">
-                <Menu className="h-5 w-5" />
-              </Button>
+            <SheetTrigger className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 w-9" aria-label="Open menu">
+              <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="left" className="w-[240px] sm:w-[300px]">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
