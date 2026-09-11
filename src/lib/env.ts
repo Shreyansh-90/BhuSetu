@@ -4,13 +4,31 @@ import 'server-only';
 const serverSchema = z.object({
   DATABASE_URL: z.string().url(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  MINIO_ENDPOINT: z.string().min(1),
+  // MinIO is intentionally optional while the storage integration is paused.
+  // If any required MinIO setting is supplied, all required settings must be supplied.
+  MINIO_ENDPOINT: z.string().min(1).optional(),
   MINIO_PORT: z.coerce.number().optional().default(9000),
   MINIO_USE_SSL: z.coerce.boolean().optional().default(false),
-  MINIO_ACCESS_KEY: z.string().min(1),
-  MINIO_SECRET_KEY: z.string().min(1),
+  MINIO_ACCESS_KEY: z.string().min(1).optional(),
+  MINIO_SECRET_KEY: z.string().min(1).optional(),
   MINIO_BUCKET: z.string().min(1).default('bhu-setu'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+}).superRefine((values, context) => {
+  const minioRequiredValues = [
+    values.MINIO_ENDPOINT,
+    values.MINIO_ACCESS_KEY,
+    values.MINIO_SECRET_KEY,
+  ];
+  const minioPartiallyConfigured = minioRequiredValues.some(Boolean);
+  const minioIncomplete = minioRequiredValues.some((value) => !value);
+
+  if (minioPartiallyConfigured && minioIncomplete) {
+    context.addIssue({
+      code: 'custom',
+      path: ['MINIO_ENDPOINT'],
+      message: 'MINIO_ENDPOINT, MINIO_ACCESS_KEY, and MINIO_SECRET_KEY must be provided together.',
+    });
+  }
 });
 
 const clientSchema = z.object({
