@@ -1,22 +1,24 @@
 import { ReactNode } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { getUserCapabilities } from '@/app/actions/auth';
 import { redirect } from 'next/navigation';
 
 export default async function WorkspaceLayout({ children }: { children: ReactNode }) {
   const capabilities = await getUserCapabilities();
 
-  // Route protection - UI only (backend still enforces real security)
+  // Route protection — UI guard only; backend enforces real authorization.
   if (!capabilities.isAuthenticated) {
     redirect('/auth/login');
   }
 
   if (!capabilities.canViewWorkspace) {
-    // Show unauthorized state
     return (
-      <div className="flex h-full flex-col items-center justify-center p-8">
-        <h1 className="text-2xl font-bold mb-4">Unauthorized</h1>
-        <p className="text-muted-foreground">You do not have permission to view the workspace.</p>
+      <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+        <h1 className="text-lg font-semibold mb-2">Access Restricted</h1>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          Your account does not have permission to access the workspace. Contact your administrator.
+        </p>
       </div>
     );
   }
@@ -24,7 +26,8 @@ export default async function WorkspaceLayout({ children }: { children: ReactNod
   return (
     <div className="flex flex-1">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto px-6 py-5">
+        <Breadcrumbs />
         {children}
       </main>
     </div>

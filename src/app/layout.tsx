@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BhuSetu - Land Acquisition",
-  description: "National Land Acquisition and Monitoring System",
+  title: "BhuSetu | National Land Acquisition & Management Platform",
+  description: "National unified land-acquisition and project monitoring platform",
 };
 
 export default async function RootLayout({
