@@ -2,27 +2,22 @@ import { getUserCapabilities } from "./actions/auth";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AppShell } from "@/components/layout/AppShell";
 import type { Metadata } from "next";
-import { Noto_Sans, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const notoSans = Noto_Sans({
-  variable: "--font-noto-sans",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-<<<<<<< HEAD
-  title: "BhuSetu | National Land Acquisition & Management Platform",
-  description: "National unified land-acquisition and project monitoring platform",
-=======
   title: "BhuSetu - Land Acquisition",
   description: "National Land Acquisition and Monitoring System",
->>>>>>> 5d3be0bcb3eb744a263dc020715cff6274de3d27
 };
 
 export default async function RootLayout({
@@ -33,10 +28,6 @@ export default async function RootLayout({
   const capabilities = await getUserCapabilities();
 
   return (
-<<<<<<< HEAD
-    <html lang="en" className={`${notoSans.variable} ${jetbrainsMono.variable}`}>
-      <body className="antialiased font-sans">{children}</body>
-=======
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <AuthProvider capabilities={capabilities}>
@@ -45,7 +36,6 @@ export default async function RootLayout({
           </AppShell>
         </AuthProvider>
       </body>
->>>>>>> 5d3be0bcb3eb744a263dc020715cff6274de3d27
     </html>
   );
 }
