@@ -37,7 +37,6 @@ export default function CreateProjectDialog({ onSuccess }: { onSuccess?: () => v
       category: 'normal',
       stateCode: '',
       districtCode: '',
-      requestingOrgId: '00000000-0000-0000-0000-000000000000', // Mock UUID for now
     },
   });
 

@@ -5,9 +5,9 @@ import { requireMinimumRole } from '@/lib/api/authorize';
 import { validateRequest } from '@/lib/api/validation';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { db } from '@/lib/db';
-import { projects, auditEvents } from '@/lib/db/schema';
+import { projects, auditEvents, workflowTasks } from '@/lib/db/schema';
 import { updateProjectSchema } from '@/lib/dtos/projects';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import { z } from 'zod';
 import { extractClientIp } from '@/lib/api/utils';
 
@@ -45,7 +45,16 @@ async function getProjectDetail(request: NextRequest, { logger, params }: ApiHan
     }
   }
 
-  return successResponse(project);
+  // Fetch active workflow task if any
+  const activeTask = await db.query.workflowTasks.findFirst({
+    where: and(
+      eq(workflowTasks.projectId, projectId),
+      eq(workflowTasks.status, 'pending')
+    ),
+    orderBy: [desc(workflowTasks.createdAt)],
+  });
+
+  return successResponse({ ...project, activeTask });
 }
 
 async function updateProjectDraft(request: NextRequest, { logger, params }: ApiHandlerContext) {

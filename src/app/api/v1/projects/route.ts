@@ -85,7 +85,12 @@ async function createProject(request: NextRequest, { logger }: ApiHandlerContext
     if (user.districtCode && body.districtCode !== user.districtCode) {
       return errorResponse('FORBIDDEN', 'You cannot create projects outside your assigned district.');
     }
-    // Note: Requesting organization logic/checks could be added here.
+  }
+
+  // Ensure user has an organization ID before creating the project
+  const orgId = user.organizationId;
+  if (!orgId) {
+    return errorResponse('FORBIDDEN', 'You must be assigned to an organization to create projects.');
   }
 
   // Insert project and audit event in a transaction
@@ -98,7 +103,7 @@ async function createProject(request: NextRequest, { logger }: ApiHandlerContext
         purpose: body.purpose,
         stateCode: body.stateCode,
         districtCode: body.districtCode,
-        requestingOrgId: body.requestingOrgId,
+        requestingOrgId: orgId,
         acquiringOrgId: body.acquiringOrgId,
         estimatedAreaSqm: body.estimatedAreaSqm,
         createdBy: user.id,

@@ -7,7 +7,7 @@ export const createProjectSchema = z.object({
   purpose: z.string().min(5).max(1000),
   stateCode: z.string().length(2),
   districtCode: z.string().length(3),
-  requestingOrgId: z.string().uuid(),
+  requestingOrgId: z.string().uuid().optional(),
   acquiringOrgId: z.string().uuid().optional(),
   estimatedAreaSqm: z.number().positive().optional(),
 });

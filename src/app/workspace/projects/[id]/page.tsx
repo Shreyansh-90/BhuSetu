@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SubmitProjectDialog from '@/components/projects/SubmitProjectDialog';
+import EditProjectDialog from '@/components/projects/EditProjectDialog';
+import ClarificationDialog from '@/components/projects/ClarificationDialog';
+import { useAuth } from '@/hooks/use-auth';
 
 type Project = {
   id: string;
@@ -21,6 +24,12 @@ type Project = {
   estimatedAreaSqm?: number;
   createdAt: string;
   updatedAt: string;
+  activeTask?: {
+    id: string;
+    title: string;
+    description: string;
+    status: string;
+  };
 };
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -28,6 +37,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { canSubmitProposals, canViewWorkspace } = useAuth();
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -89,8 +99,16 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           </p>
         </div>
         <div className="flex gap-2">
-          {project.status === 'draft' && (
-            <SubmitProjectDialog projectId={project.id} />
+          {project.status === 'draft' && canSubmitProposals && (
+            <>
+              <EditProjectDialog project={project} onSuccess={() => {
+                window.location.reload(); 
+              }} />
+              <SubmitProjectDialog projectId={project.id} />
+            </>
+          )}
+          {project.activeTask && project.activeTask.status === 'pending' && canViewWorkspace && (
+            <ClarificationDialog task={project.activeTask} onSuccess={() => window.location.reload()} />
           )}
         </div>
       </div>

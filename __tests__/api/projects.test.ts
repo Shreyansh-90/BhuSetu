@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST as submitProject } from '../../src/app/api/v1/projects/[projectId]/submit/route';
+import { POST as createProject } from '../../src/app/api/v1/projects/route';
+import { PATCH as updateProjectDraft } from '../../src/app/api/v1/projects/[projectId]/route';
 import { extractClientIp } from '../../src/lib/api/utils';
 import { db } from '@/lib/db';
 import { getAuthenticatedUser } from '@/lib/api/auth';
@@ -136,6 +138,145 @@ describe('Project REST API', () => {
 
       expect(response.status).toBe(200);
       expect(db.transaction).toHaveBeenCalled();
+  });
+
+  describe('Create Project', () => {
+    it('creates project securely with user.organizationId', async () => {
+      (getAuthenticatedUser as any).mockResolvedValue({
+        success: true,
+        user: {
+          id: 'user-001',
+          role: 'project_manager',
+          organizationId: 'org-001',
+        },
+      });
+
+      const txMock = {
+        insert: vi.fn(() => ({
+          values: vi.fn(() => ({
+            returning: vi.fn().mockResolvedValue([{ id: 'proj-1', requestingOrgId: 'org-001' }])
+          }))
+        }))
+      };
+      (db.transaction as any).mockImplementation(async (cb: any) => {
+        return cb(txMock);
+      });
+
+      const body = {
+        title: 'Test Project',
+        purpose: 'Testing',
+        category: 'normal',
+        stateCode: 'MP',
+        districtCode: 'BPL',
+      };
+
+      const request = makeRequest(body, 'http://localhost/api/v1/projects');
+      const response = await createProject(request, { logger: console } as any);
+      
+      expect(response.status).toBe(201);
+      const json = await response.json();
+      expect(json.data.requestingOrgId).toBe('org-001');
+    });
+
+    it('returns 403 FORBIDDEN if user has no organizationId', async () => {
+      (getAuthenticatedUser as any).mockResolvedValue({
+        success: true,
+        user: {
+          id: 'user-001',
+          role: 'project_manager',
+          organizationId: null, // No organization
+        },
+      });
+
+      const body = {
+        title: 'Test Project',
+        purpose: 'Testing',
+        category: 'normal',
+        stateCode: 'MP',
+        districtCode: 'BPL',
+      };
+
+      const request = makeRequest(body, 'http://localhost/api/v1/projects');
+      const response = await createProject(request, { logger: console } as any);
+      
+      expect(response.status).toBe(403);
+    });
+  });
+  describe('Edit Project Draft (PATCH)', () => {
+    it('updates draft project successfully', async () => {
+      (getAuthenticatedUser as any).mockResolvedValue({
+        success: true,
+        user: {
+          id: 'user-001',
+          role: 'project_manager',
+          stateCode: 'MP',
+        },
+      });
+
+      (db.query.projects.findFirst as any).mockResolvedValue({
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        status: 'draft',
+        stateCode: 'MP',
+        districtCode: 'BPL',
+      });
+
+      const txMock = {
+        update: vi.fn(() => ({
+          set: vi.fn(() => ({
+            where: vi.fn(() => ({
+              returning: vi.fn().mockResolvedValue([{ id: 'proj-1', title: 'Updated Title' }])
+            }))
+          }))
+        })),
+        insert: vi.fn(() => ({
+          values: vi.fn().mockResolvedValue({})
+        }))
+      };
+      (db.transaction as any).mockImplementation(async (cb: any) => {
+        return cb(txMock);
+      });
+
+      const body = { title: 'Updated Title' };
+      const request = new NextRequest('http://localhost/api/v1/projects/123e4567-e89b-12d3-a456-426614174000', {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const response = await updateProjectDraft(request, { 
+        params: Promise.resolve({ projectId: '123e4567-e89b-12d3-a456-426614174000' }),
+        logger: console 
+      } as any);
+
+      expect(response.status).toBe(200);
+    });
+
+    it('prevents updating non-draft project', async () => {
+      (getAuthenticatedUser as any).mockResolvedValue({
+        success: true,
+        user: { id: 'user-001', role: 'project_manager', stateCode: 'MP' },
+      });
+
+      (db.query.projects.findFirst as any).mockResolvedValue({
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        status: 'submitted', // NOT DRAFT
+        stateCode: 'MP',
+        districtCode: 'BPL',
+      });
+
+      const body = { title: 'Updated Title' };
+      const request = new NextRequest('http://localhost/api/v1/projects/123e4567-e89b-12d3-a456-426614174000', {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const response = await updateProjectDraft(request, { 
+        params: Promise.resolve({ projectId: '123e4567-e89b-12d3-a456-426614174000' }),
+        logger: console 
+      } as any);
+
+      expect(response.status).toBe(409); // CONFLICT
     });
   });
 });
@@ -173,4 +314,5 @@ describe('extractClientIp', () => {
     });
     expect(extractClientIp(req)).toBeNull();
   });
+});
 });
