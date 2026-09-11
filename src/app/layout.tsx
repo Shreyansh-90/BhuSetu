@@ -2,16 +2,16 @@ import { getUserCapabilities } from "./actions/auth";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AppShell } from "@/components/layout/AppShell";
 import type { Metadata } from "next";
-import { Noto_Sans, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const notoSans = Noto_Sans({
-  variable: "--font-noto-sans",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -28,8 +28,19 @@ export default async function RootLayout({
   const capabilities = await getUserCapabilities();
 
   return (
+<<<<<<< HEAD
     <html lang="en" className={`${notoSans.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased font-sans">{children}</body>
+=======
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
+        <AuthProvider capabilities={capabilities}>
+          <AppShell>
+            {children}
+          </AppShell>
+        </AuthProvider>
+      </body>
+>>>>>>> 0f4e3140a4eb86f9ed99138dbf9c0b7efc802d57
     </html>
   );
 }
