@@ -11,6 +11,7 @@ import SubmitProjectDialog from '@/components/projects/SubmitProjectDialog';
 import EditProjectDialog from '@/components/projects/EditProjectDialog';
 import ClarificationDialog from '@/components/projects/ClarificationDialog';
 import DocumentList from '@/components/documents/DocumentList';
+import MilestoneList from '@/components/milestones/MilestoneList';
 import { useAuth } from '@/hooks/use-auth';
 
 type Project = {
@@ -117,6 +118,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="milestones">Milestones</TabsTrigger>
           <TabsTrigger value="map">Map Summary</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="timeline">Activity Timeline</TabsTrigger>
@@ -172,6 +174,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="milestones">
+          <MilestoneList projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="map">
