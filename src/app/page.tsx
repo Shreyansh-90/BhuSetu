@@ -1,69 +1,38 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { Button } from '@/components/ui/button';
+import { Map, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] text-center px-4">
+      <div className="max-w-3xl space-y-8">
+        <div className="flex justify-center mb-8">
+          <div className="rounded-full bg-primary/10 p-6">
+            <Map className="h-16 w-16 text-primary" />
+          </div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        
+        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-foreground">
+          BhuSetu
+        </h1>
+        <p className="mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl">
+          National Land Acquisition and Monitoring System.
+          A unified platform for transparent, efficient, and auditable land acquisition workflows.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+          <Link href="/auth/login">
+            <Button size="lg" className="gap-2">
+              Authority Login <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link href="/public-search">
+            <Button variant="outline" size="lg">
+              Public Land Search
+            </Button>
+          </Link>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

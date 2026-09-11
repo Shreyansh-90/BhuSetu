@@ -1,3 +1,6 @@
+import { getUserCapabilities } from "./actions/auth";
+import { AuthProvider } from "@/hooks/use-auth";
+import { AppShell } from "@/components/layout/AppShell";
 import type { Metadata } from "next";
 import { Noto_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
@@ -13,14 +16,36 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+<<<<<<< HEAD
   title: "BhuSetu | National Land Acquisition & Management Platform",
   description: "National unified land-acquisition and project monitoring platform",
+=======
+  title: "BhuSetu - Land Acquisition",
+  description: "National Land Acquisition and Monitoring System",
+>>>>>>> 5d3be0bcb3eb744a263dc020715cff6274de3d27
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const capabilities = await getUserCapabilities();
+
   return (
+<<<<<<< HEAD
     <html lang="en" className={`${notoSans.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased font-sans">{children}</body>
+=======
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
+        <AuthProvider capabilities={capabilities}>
+          <AppShell>
+            {children}
+          </AppShell>
+        </AuthProvider>
+      </body>
+>>>>>>> 5d3be0bcb3eb744a263dc020715cff6274de3d27
     </html>
   );
 }
