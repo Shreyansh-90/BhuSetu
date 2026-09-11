@@ -28,19 +28,8 @@ export default async function RootLayout({
   const capabilities = await getUserCapabilities();
 
   return (
-<<<<<<< HEAD
     <html lang="en" className={`${notoSans.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased font-sans">{children}</body>
-=======
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>
-        <AuthProvider capabilities={capabilities}>
-          <AppShell>
-            {children}
-          </AppShell>
-        </AuthProvider>
-      </body>
->>>>>>> 0f4e3140a4eb86f9ed99138dbf9c0b7efc802d57
     </html>
   );
 }
