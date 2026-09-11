@@ -8,6 +8,7 @@
 -- 1. Extensions
 -- ---------------------------------------------------------------------------
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA extensions;
+SET search_path TO public, extensions;
 
 -- ---------------------------------------------------------------------------
 -- 2. Custom Enum Types
