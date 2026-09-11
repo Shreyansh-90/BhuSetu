@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SubmitProjectDialog from '@/components/projects/SubmitProjectDialog';
 import EditProjectDialog from '@/components/projects/EditProjectDialog';
 import ClarificationDialog from '@/components/projects/ClarificationDialog';
+import DocumentList from '@/components/documents/DocumentList';
 import { useAuth } from '@/hooks/use-auth';
 
 type Project = {
@@ -194,9 +195,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               <CardDescription>Official notices, maps, and land schedules.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-32 border-2 border-dashed rounded-md flex items-center justify-center text-muted-foreground bg-muted/20">
-                [Document Management Paused - F5 Pending]
-              </div>
+              <DocumentList projectId={project.id} canUpload={canSubmitProposals} />
             </CardContent>
           </Card>
         </TabsContent>

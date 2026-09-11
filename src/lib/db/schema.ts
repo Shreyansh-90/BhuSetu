@@ -13,6 +13,7 @@ import {
   doublePrecision,
   inet,
   integer,
+  bigint,
   jsonb,
   pgEnum,
   pgTable,
@@ -99,6 +100,23 @@ export const geometryVerificationStatusEnum = pgEnum('geometry_verification_stat
   'verified',
   'rejected',
   'stale',
+]);
+
+export const documentClassificationEnum = pgEnum('document_classification', [
+  'notice',
+  'map',
+  'schedule',
+  'report',
+  'evidence',
+  'other',
+]);
+
+export const documentStatusEnum = pgEnum('document_status', [
+  'initiated',
+  'uploaded',
+  'verified',
+  'rejected',
+  'archived',
 ]);
 
 // Drizzle does not provide a built-in PostGIS geography type.
@@ -279,5 +297,31 @@ export const auditEvents = pgTable('audit_events', {
   oldValues: jsonb('old_values'),
   newValues: jsonb('new_values'),
   metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---------------------------------------------------------------------------
+// Document tables
+// ---------------------------------------------------------------------------
+
+export const documents = pgTable('documents', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  classification: documentClassificationEnum('classification').notNull(),
+  status: documentStatusEnum('status').notNull().default('initiated'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const documentVersions = pgTable('document_versions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  documentId: uuid('document_id').notNull().references(() => documents.id, { onDelete: 'cascade' }),
+  versionNumber: integer('version_number').notNull(),
+  filename: text('filename').notNull(),
+  mimeType: text('mime_type').notNull(),
+  sizeBytes: bigint('size_bytes', { mode: 'number' }).notNull(),
+  minioObjectKey: text('minio_object_key').notNull(),
+  contentHash: text('content_hash'),
+  uploadedBy: uuid('uploaded_by').notNull().references(() => userProfiles.id),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });

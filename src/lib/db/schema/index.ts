@@ -1,3 +1,10 @@
-// Compatibility entry point for code that imports the former split schema
-// directory. The canonical definitions now live in ../schema.ts.
-export * from '../schema';
+export * from './enums';
+export * from './organizations';
+export * from './users';
+export * from './projects';
+export * from './parcels';
+export * from './acquisition-cases';
+export * from './milestones';
+export * from './workflow-tasks';
+export * from './audit-events';
+export * from './spatial';

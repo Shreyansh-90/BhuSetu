@@ -73,3 +73,20 @@ export const geometryVerificationStatusEnum = pgEnum('geometry_verification_stat
   'rejected',
   'stale',
 ]);
+
+export const documentClassificationEnum = pgEnum('document_classification', [
+  'notice',
+  'map',
+  'schedule',
+  'report',
+  'evidence',
+  'other',
+]);
+
+export const documentStatusEnum = pgEnum('document_status', [
+  'initiated',
+  'uploaded',
+  'verified',
+  'rejected',
+  'archived',
+]);
