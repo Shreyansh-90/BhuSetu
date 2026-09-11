@@ -35,23 +35,15 @@
     "zod": "^4.6.0"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20",
-=======
-    "@types/node": "^22.20.2",
->>>>>>> 5d3be0bcb3eb744a263dc020715cff6274de3d27
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.5.5",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "postcss": "^8.5.28",
-<<<<<<< HEAD
     "tailwindcss": "^4.3.3",
-=======
-    "tailwindcss": "^3.4.19",
->>>>>>> 5d3be0bcb3eb744a263dc020715cff6274de3d27
     "typescript": "^5",
     "vite": "^8.2.2",
     "vitest": "^5.0.0"
