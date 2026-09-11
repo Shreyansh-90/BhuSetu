@@ -16,3 +16,14 @@ coverage/
 # Local MinIO state
 minio-data/
 
+# Supabase local data
+supabase/.temp/
+supabase/.branches/
+
+01-shared-system-contract.md
+02-backend-agent-tasks.md
+03-frontend-agent-tasks.md
+04-agent-operating-guide.md
+
+AGENTS.md
+CLAUDE.md
