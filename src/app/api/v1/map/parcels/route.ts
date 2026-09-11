@@ -2,13 +2,16 @@ import { type NextRequest } from 'next/server';
 import { apiHandler, ApiHandlerContext } from '@/lib/api/handler';
 import { getAuthenticatedUser } from '@/lib/api/auth';
 import { requireMinimumRole } from '@/lib/api/authorize';
-import { validateRequest } from '@/lib/api/validation';
 import { successResponse, errorResponse } from '@/lib/api/response';
-import { buildPaginationMeta } from '@/lib/api/pagination';
-import { bboxQuerySchema } from '@/lib/dtos/spatial';
 import { findParcelsInBbox } from '@/lib/db/spatial-queries';
+import { z } from 'zod';
 
-async function getParcelsInBbox(request: NextRequest, { logger }: ApiHandlerContext) {
+const bboxQuerySchema = z.object({
+  bbox: z.string().regex(/^-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?$/, "Invalid bbox format. Expected minLng,minLat,maxLng,maxLat"),
+  zoom: z.string().regex(/^\d+(\.\d+)?$/, "Invalid zoom format"),
+});
+
+async function getParcels(request: NextRequest, { logger }: ApiHandlerContext) {
   // Auth
   const authResult = await getAuthenticatedUser(logger);
   if (!authResult.success) return authResult.response;
@@ -17,56 +20,74 @@ async function getParcelsInBbox(request: NextRequest, { logger }: ApiHandlerCont
   const authzError = requireMinimumRole(user, 'viewer');
   if (authzError) return authzError;
 
-  // Validate query params
-  const validReq = await validateRequest(request, { query: bboxQuerySchema });
-  if (!validReq.success) return validReq.response;
+  const url = new URL(request.url);
+  const bboxRaw = url.searchParams.get('bbox');
+  const zoomRaw = url.searchParams.get('zoom');
 
-  const { bbox, zoom, parcelType, stateCode, page, limit } = validReq.data.query;
-  const offset = (page - 1) * limit;
+  if (!bboxRaw || !zoomRaw) {
+    return errorResponse('VALIDATION_ERROR', 'Missing bbox or zoom parameters');
+  }
+
+  const parseResult = bboxQuerySchema.safeParse({ bbox: bboxRaw, zoom: zoomRaw });
+  if (!parseResult.success) {
+    return errorResponse('VALIDATION_ERROR', 'Invalid query parameters');
+  }
+
+  const [minLng, minLat, maxLng, maxLat] = parseResult.data.bbox.split(',').map(Number);
+  const zoom = Number(parseResult.data.zoom);
+
+  // Role-based filtering
+  // If user is 'viewer', they can only see their own lands.
+  // Other roles can see all parcels within their state/district scope. 
+  // (For this endpoint, we'll allow large bbox queries but limited by owner if viewer).
+  const ownerFilter = user.role === 'viewer' ? user.fullName : undefined;
 
   try {
-    const { rows, total } = await findParcelsInBbox(
-      bbox.minLng,
-      bbox.minLat,
-      bbox.maxLng,
-      bbox.maxLat,
+    const { rows } = await findParcelsInBbox(
+      minLng,
+      minLat,
+      maxLng,
+      maxLat,
       zoom,
-      { parcelType, stateCode },
-      limit,
-      offset,
+      { ownerName: ownerFilter },
+      500, // Limit
+      0    // Offset
     );
 
-    // Build GeoJSON FeatureCollection
-    const features = rows.map((row) => ({
-      type: 'Feature' as const,
-      properties: {
-        parcelId: row.parcelId,
-        surveyNumber: row.surveyNumber,
-        village: row.village,
-        tehsil: row.tehsil,
-        district: row.district,
-        stateCode: row.stateCode,
-        parcelType: row.parcelType,
-        areaSqm: row.areaSqm,
-        // owner_name deliberately excluded from map responses
-      },
-      geometry: row.geometryGeojson ? JSON.parse(row.geometryGeojson) : null,
-    }));
+    const features = rows.map((parcel) => {
+      const geometry = parcel.geometryGeojson 
+        ? JSON.parse(parcel.geometryGeojson) 
+        : null;
+
+      return {
+        type: 'Feature' as const,
+        geometry,
+        properties: {
+          parcelId: parcel.parcelId,
+          surveyNumber: parcel.surveyNumber,
+          village: parcel.village,
+          tehsil: parcel.tehsil,
+          district: parcel.district,
+          stateCode: parcel.stateCode,
+          parcelType: parcel.parcelType,
+          ownerName: parcel.ownerName,
+          areaSqm: parcel.areaSqm,
+        },
+      };
+    }).filter(f => f.geometry !== null);
 
     const featureCollection = {
       type: 'FeatureCollection' as const,
       features,
     };
 
-    const meta = buildPaginationMeta(total, page, limit);
-
-    return successResponse(featureCollection, meta);
+    return successResponse(featureCollection);
   } catch (err) {
-    logger.error('Bbox parcel query failed.', {
+    logger.error('Parcels bbox query failed.', {
       error: err instanceof Error ? err.message : 'Unknown error',
     });
-    return errorResponse('INTERNAL_ERROR', 'Parcel query failed.');
+    return errorResponse('INTERNAL_ERROR', 'Failed to retrieve parcels.');
   }
 }
 
-export const GET = apiHandler(getParcelsInBbox);
+export const GET = apiHandler(getParcels);

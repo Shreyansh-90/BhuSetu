@@ -2,6 +2,7 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -181,8 +182,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               <CardDescription>Visual summary of the public land intersection.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-64 border-2 border-dashed rounded-md flex items-center justify-center text-muted-foreground bg-muted/20">
-                [Map Integration Paused - F2/F3 Pending]
+              <div className="h-64 border rounded-md flex flex-col items-center justify-center text-muted-foreground bg-muted/20 gap-4">
+                <p>Interactive Mapbox Integration Available</p>
+                <Link href={`/workspace/projects/${project.id}/map`}>
+                  <Button variant="default">Open Interactive Map</Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

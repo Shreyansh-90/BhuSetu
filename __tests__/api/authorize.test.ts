@@ -11,6 +11,7 @@ function makeUser(overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser
     id: 'user-001',
     authUserId: 'auth-001',
     email: 'test@example.com',
+    fullName: 'Test User',
     role: 'viewer',
     organizationId: null,
     stateCode: null,

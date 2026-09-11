@@ -33,13 +33,14 @@ export interface IntersectionResult {
   district: string;
   stateCode: string;
   parcelType: string;
+  ownerName: string | null;
   parcelAreaSqm: number | null;
   intersectionAreaSqm: number;
   overlapPercent: number | null;
   intersectionGeojson: string;
 }
 
-export async function findProjectIntersections(projectId: string): Promise<IntersectionResult[]> {
+export async function findProjectIntersections(projectId: string, ownerFilter?: string): Promise<IntersectionResult[]> {
   const result = await db.execute(sql`
     SELECT
       p.id                AS "parcelId",
@@ -49,6 +50,7 @@ export async function findProjectIntersections(projectId: string): Promise<Inter
       p.district          AS "district",
       p.state_code        AS "stateCode",
       p.parcel_type       AS "parcelType",
+      p.owner_name        AS "ownerName",
       p.area_sqm          AS "parcelAreaSqm",
       ST_Area(
         ST_Intersection(pg.geometry::geometry, pag.geometry::geometry)::geography
@@ -69,6 +71,7 @@ export async function findProjectIntersections(projectId: string): Promise<Inter
     WHERE pg.project_id = ${projectId}
       AND pg.is_active = true
       AND ST_Intersects(pg.geometry, pag.geometry)
+      ${ownerFilter ? sql`AND p.owner_name = ${ownerFilter}` : sql``}
     ORDER BY "intersectionAreaSqm" DESC
   `);
 
@@ -87,6 +90,7 @@ export interface BboxParcelResult {
   district: string;
   stateCode: string;
   parcelType: string;
+  ownerName: string | null;
   areaSqm: number | null;
   geometryGeojson: string;
 }
@@ -97,7 +101,7 @@ export async function findParcelsInBbox(
   maxLng: number,
   maxLat: number,
   zoom: number,
-  filters: { parcelType?: string; stateCode?: string },
+  filters: { parcelType?: string; stateCode?: string; ownerName?: string },
   limit: number,
   offset: number,
 ): Promise<{ rows: BboxParcelResult[]; total: number }> {
@@ -120,6 +124,7 @@ export async function findParcelsInBbox(
     WHERE ${conditions}
       ${filters.parcelType ? sql`AND p.parcel_type = ${filters.parcelType}` : sql``}
       ${filters.stateCode ? sql`AND p.state_code = ${filters.stateCode}` : sql``}
+      ${filters.ownerName ? sql`AND p.owner_name = ${filters.ownerName}` : sql``}
       AND p.archived_at IS NULL
   `);
 
@@ -135,6 +140,7 @@ export async function findParcelsInBbox(
       p.district          AS "district",
       p.state_code        AS "stateCode",
       p.parcel_type       AS "parcelType",
+      p.owner_name        AS "ownerName",
       p.area_sqm          AS "areaSqm",
       ST_AsGeoJSON(
         ST_SimplifyPreserveTopology(pag.geometry::geometry, ${tolerance})
@@ -144,6 +150,7 @@ export async function findParcelsInBbox(
     WHERE ${conditions}
       ${filters.parcelType ? sql`AND p.parcel_type = ${filters.parcelType}` : sql``}
       ${filters.stateCode ? sql`AND p.state_code = ${filters.stateCode}` : sql``}
+      ${filters.ownerName ? sql`AND p.owner_name = ${filters.ownerName}` : sql``}
       AND p.archived_at IS NULL
     ORDER BY p.district, p.survey_number
     LIMIT ${limit}
