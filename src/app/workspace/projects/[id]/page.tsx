@@ -16,6 +16,7 @@ import MilestoneList from '@/components/milestones/MilestoneList';
 import AwardList from '@/components/awards/AwardList';
 import PaymentList from '@/components/payments/PaymentList';
 import RRWorkspace from '@/components/rr/RRWorkspace';
+import PossessionWorkspace from '@/components/possession/PossessionWorkspace';
 import { useAuth } from '@/hooks/use-auth';
 
 type Project = {
@@ -119,7 +120,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <TabsList className="mb-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
-          <TabsTrigger value="awards">Awards</TabsTrigger>`n          <TabsTrigger value="payments">Payments</TabsTrigger>`n          <TabsTrigger value="rr">R&&R</TabsTrigger>
+          <TabsTrigger value="awards">Awards</TabsTrigger>`n          <TabsTrigger value="payments">Payments</TabsTrigger>`n          <TabsTrigger value="rr">R&&R</TabsTrigger>`n          <TabsTrigger value="closure" className="text-rose-600 data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-900/30">Closure</TabsTrigger>
           <TabsTrigger value="map">Map Summary</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="timeline">Activity Timeline</TabsTrigger>
@@ -186,6 +187,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
         <TabsContent value="rr">
           <RRWorkspace projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="closure">
+          <PossessionWorkspace projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="map">
