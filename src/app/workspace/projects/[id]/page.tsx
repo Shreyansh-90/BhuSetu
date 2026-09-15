@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
@@ -13,6 +13,7 @@ import EditProjectDialog from '@/components/projects/EditProjectDialog';
 import ClarificationDialog from '@/components/projects/ClarificationDialog';
 import DocumentList from '@/components/documents/DocumentList';
 import MilestoneList from '@/components/milestones/MilestoneList';
+import AwardList from '@/components/awards/AwardList';
 import { useAuth } from '@/hooks/use-auth';
 
 type Project = {
@@ -50,8 +51,6 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         if (res.ok) {
           const json = await res.json();
           setProject(json.data);
-        } else {
-          // Redirect or show error
         }
       } catch (err) {
         console.error('Failed to fetch project', err);
@@ -104,9 +103,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex gap-2">
           {project.status === 'draft' && canSubmitProposals && (
             <>
-              <EditProjectDialog project={project} onSuccess={() => {
-                window.location.reload(); 
-              }} />
+              <EditProjectDialog project={project} onSuccess={() => { window.location.reload(); }} />
               <SubmitProjectDialog projectId={project.id} />
             </>
           )}
@@ -120,6 +117,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <TabsList className="mb-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
+          <TabsTrigger value="awards">Awards</TabsTrigger>
           <TabsTrigger value="map">Map Summary</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="timeline">Activity Timeline</TabsTrigger>
@@ -128,9 +126,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
-              <CardHeader>
-                <CardTitle>Project Details</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle>Project Details</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <h4 className="text-sm font-medium text-muted-foreground">Category</h4>
@@ -146,11 +142,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                 </div>
               </CardContent>
             </Card>
-
             <Card>
-              <CardHeader>
-                <CardTitle>Location & Metadata</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle>Location & Metadata</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -179,6 +172,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
         <TabsContent value="milestones">
           <MilestoneList projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="awards">
+          <AwardList projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="map">
