@@ -440,3 +440,25 @@ export const rrEntitlements = pgTable('rr_entitlements', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ---------------------------------------------------------------------------
+// Possession and Closure tables
+// ---------------------------------------------------------------------------
+
+export const possessionStatusEnum = pgEnum('possession_status', [
+  'pending',
+  'scheduled',
+  'handed_over',
+]);
+
+export const possessionRecords = pgTable('possession_records', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  parcelId: uuid('parcel_id').references(() => parcels.id, { onDelete: 'set null' }),
+  status: possessionStatusEnum('status').notNull().default('pending'),
+  possessionDate: date('possession_date'),
+  remarks: text('remarks'),
+  documents: jsonb('documents').$type<string[]>(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
