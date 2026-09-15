@@ -392,3 +392,51 @@ export const payments = pgTable('payments', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ---------------------------------------------------------------------------
+// R&R (Resettlement & Rehabilitation) tables
+// ---------------------------------------------------------------------------
+
+export const familyCategoryEnum = pgEnum('family_category', [
+  'owner',
+  'tenant',
+  'agricultural_laborer',
+  'artisan',
+]);
+
+export const entitlementTypeEnum = pgEnum('entitlement_type', [
+  'housing',
+  'land',
+  'cash',
+  'employment',
+  'transportation',
+]);
+
+export const rrStatusEnum = pgEnum('rr_status', [
+  'pending',
+  'approved',
+  'provided',
+]);
+
+export const affectedFamilies = pgTable('affected_families', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  parcelId: uuid('parcel_id').references(() => parcels.id, { onDelete: 'set null' }),
+  headOfFamilyName: text('head_of_family_name').notNull(),
+  familySize: integer('family_size').notNull().default(1),
+  category: familyCategoryEnum('category').notNull(),
+  status: rrStatusEnum('status').notNull().default('pending'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const rrEntitlements = pgTable('rr_entitlements', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => affectedFamilies.id, { onDelete: 'cascade' }),
+  entitlementType: entitlementTypeEnum('entitlement_type').notNull(),
+  amount: doublePrecision('amount'),
+  description: text('description'),
+  status: rrStatusEnum('status').notNull().default('pending'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});

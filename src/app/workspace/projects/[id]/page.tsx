@@ -15,6 +15,7 @@ import DocumentList from '@/components/documents/DocumentList';
 import MilestoneList from '@/components/milestones/MilestoneList';
 import AwardList from '@/components/awards/AwardList';
 import PaymentList from '@/components/payments/PaymentList';
+import RRWorkspace from '@/components/rr/RRWorkspace';
 import { useAuth } from '@/hooks/use-auth';
 
 type Project = {
@@ -118,7 +119,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <TabsList className="mb-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
-          <TabsTrigger value="awards">Awards</TabsTrigger>`n          <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="awards">Awards</TabsTrigger>`n          <TabsTrigger value="payments">Payments</TabsTrigger>`n          <TabsTrigger value="rr">R&&R</TabsTrigger>
           <TabsTrigger value="map">Map Summary</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="timeline">Activity Timeline</TabsTrigger>
@@ -181,6 +182,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
         <TabsContent value="payments">
           <PaymentList projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="rr">
+          <RRWorkspace projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="map">
