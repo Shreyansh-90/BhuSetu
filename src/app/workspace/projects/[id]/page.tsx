@@ -17,6 +17,7 @@ import AwardList from '@/components/awards/AwardList';
 import PaymentList from '@/components/payments/PaymentList';
 import RRWorkspace from '@/components/rr/RRWorkspace';
 import PossessionWorkspace from '@/components/possession/PossessionWorkspace';
+import ProjectDashboard from '@/components/dashboard/ProjectDashboard';
 import { useAuth } from '@/hooks/use-auth';
 
 type Project = {
@@ -117,7 +118,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="mb-4">
+        <TabsList className="mb-4">`n          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
           <TabsTrigger value="awards">Awards</TabsTrigger>`n          <TabsTrigger value="payments">Payments</TabsTrigger>`n          <TabsTrigger value="rr">R&&R</TabsTrigger>`n          <TabsTrigger value="closure" className="text-rose-600 data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-900/30">Closure</TabsTrigger>
@@ -191,6 +192,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
         <TabsContent value="closure">
           <PossessionWorkspace projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="dashboard">
+          <ProjectDashboard projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="map">
