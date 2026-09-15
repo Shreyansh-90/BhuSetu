@@ -26,6 +26,7 @@ export interface AuthenticatedUser {
   /** Supabase auth.users.id */
   authUserId: string;
   email: string;
+  fullName: string;
   role: UserRole;
   organizationId: string | null;
   stateCode: string | null;
@@ -99,6 +100,7 @@ export async function getAuthenticatedUser(
       id: profile.id,
       authUserId: profile.auth_user_id,
       email: profile.email,
+      fullName: profile.full_name,
       role: profile.role as UserRole,
       organizationId: profile.organization_id,
       stateCode: profile.state_code,

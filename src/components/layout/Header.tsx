@@ -11,6 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/use-auth';
 import { signOutAction } from '@/app/actions/auth';
@@ -82,13 +83,15 @@ export function Header() {
               <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel className="font-normal space-y-0.5">
-                <p className="text-xs text-muted-foreground">Signed in as</p>
-                <p className="text-sm font-medium truncate">{user?.email}</p>
-                <p className="text-xs text-muted-foreground capitalize">
-                  {user?.role.replace(/_/g, ' ')}
-                </p>
-              </DropdownMenuLabel>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="font-normal space-y-0.5">
+                  <p className="text-xs text-muted-foreground">Signed in as</p>
+                  <p className="text-sm font-medium truncate">{user?.email}</p>
+                  <p className="text-xs text-muted-foreground capitalize">
+                    {user?.role.replace(/_/g, ' ')}
+                  </p>
+                </DropdownMenuLabel>
+              </DropdownMenuGroup>
               <DropdownMenuSeparator />
               {canViewWorkspace && (
                 <Link href="/workspace">
