@@ -64,6 +64,20 @@ export const projectStatusEnum = pgEnum('project_status', [
   'archived',
 ]);
 
+export const awardStatusEnum = pgEnum('award_status', [
+  'draft',
+  'assessed',
+  'approved',
+  'disbursed',
+]);
+
+export const paymentStatusEnum = pgEnum('payment_status', [
+  'pending',
+  'reconciled',
+  'disputed',
+  'failed',
+]);
+
 export const acquisitionCategoryEnum = pgEnum('acquisition_category', [
   'urgent',
   'normal',
@@ -117,6 +131,13 @@ export const documentStatusEnum = pgEnum('document_status', [
   'verified',
   'rejected',
   'archived',
+]);
+
+export const notificationCategoryEnum = pgEnum('notification_category', [
+  'workflow',
+  'milestone',
+  'general',
+  'alert',
 ]);
 
 // Drizzle does not provide a built-in PostGIS geography type.
@@ -324,4 +345,50 @@ export const documentVersions = pgTable('document_versions', {
   contentHash: text('content_hash'),
   uploadedBy: uuid('uploaded_by').notNull().references(() => userProfiles.id),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---------------------------------------------------------------------------
+// Notification tables
+// ---------------------------------------------------------------------------
+
+export const notifications = pgTable('notifications', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => userProfiles.id, { onDelete: 'cascade' }),
+  category: notificationCategoryEnum('category').notNull().default('general'),
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  isRead: boolean('is_read').notNull().default(false),
+  referenceId: uuid('reference_id'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---------------------------------------------------------------------------
+// Award tables
+// ---------------------------------------------------------------------------
+
+export const awards = pgTable('awards', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  parcelId: uuid('parcel_id').notNull().references(() => parcels.id, { onDelete: 'cascade' }),
+  assessedAmount: doublePrecision('assessed_amount'),
+  awardDate: date('award_date'),
+  status: awardStatusEnum('status').notNull().default('draft'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---------------------------------------------------------------------------
+// Payment tables
+// ---------------------------------------------------------------------------
+
+export const payments = pgTable('payments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  awardId: uuid('award_id').notNull().references(() => awards.id, { onDelete: 'cascade' }),
+  paidAmount: doublePrecision('paid_amount'),
+  externalReference: text('external_reference'),
+  status: paymentStatusEnum('status').notNull().default('pending'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
