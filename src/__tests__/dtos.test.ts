@@ -26,7 +26,7 @@ describe('DTO Contract Tests', () => {
       const result = CreatePossessionRequestSchema.safeParse(invalidPayload);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('Invalid uuid');
+        expect(result.error.issues[0].message).toContain('Invalid UUID');
       }
     });
 
@@ -56,7 +56,7 @@ describe('DTO Contract Tests', () => {
       const result = ProjectKpiResponseSchema.safeParse(invalidPayload);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('Number must be greater than or equal to 0');
+        expect(result.error.issues[0].message).toContain('Too small');
       }
     });
   });

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+﻿import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
@@ -23,6 +23,7 @@ describe('Environment Variables Validation', () => {
     process.env.MINIO_SECRET_KEY = 'minioadmin';
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'public-anon-key';
+    process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN = 'test_token';
 
     const { publicEnv } = await import('../src/lib/env');
     
@@ -40,6 +41,7 @@ describe('Environment Variables Validation', () => {
     process.env.MINIO_SECRET_KEY = 'TEST_MINIO_SECRET';
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'public-anon-key';
+    process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN = 'test_token';
 
     const { publicEnv } = await import('../src/lib/env');
     const publicEnvString = JSON.stringify(publicEnv);
@@ -79,13 +81,15 @@ describe('Environment Variables Validation', () => {
     process.env.MINIO_SECRET_KEY = 'minioadmin';
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'public-anon-key';
+    process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN = 'test_token';
 
     const { publicEnv } = await import('../src/lib/env');
     
     // We only expect 2 specific keys in the public config
     expect(Object.keys(publicEnv)).toEqual([
       'NEXT_PUBLIC_SUPABASE_URL',
-      'NEXT_PUBLIC_SUPABASE_ANON_KEY'
+      'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+      'NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN'
     ]);
   });
 });
