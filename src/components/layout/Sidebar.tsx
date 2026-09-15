@@ -10,6 +10,7 @@ import {
   FolderOpen,
   ClipboardList,
   Settings,
+  Bell,
 } from 'lucide-react';
 
 interface NavItem {
@@ -46,6 +47,12 @@ export function Sidebar() {
       label: 'Documents',
       href: '/workspace/documents',
       icon: FileText,
+      show: true,
+    },
+    {
+      label: 'Notifications',
+      href: '/workspace/notifications',
+      icon: Bell,
       show: true,
     },
     {

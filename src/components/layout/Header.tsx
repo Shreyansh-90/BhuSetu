@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { signOutAction } from '@/app/actions/auth';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export function Header() {
   const { isAuthenticated, user, canViewWorkspace } = useAuth();
@@ -69,7 +70,8 @@ export function Header() {
       </nav>
 
       {/* Auth controls */}
-      <div className="ml-auto flex items-center">
+      <div className="ml-auto flex items-center gap-1">
+        {isAuthenticated && <NotificationBell />}
         {isAuthenticated ? (
           <DropdownMenu>
             <DropdownMenuTrigger
