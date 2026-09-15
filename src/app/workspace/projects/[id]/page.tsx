@@ -14,6 +14,7 @@ import ClarificationDialog from '@/components/projects/ClarificationDialog';
 import DocumentList from '@/components/documents/DocumentList';
 import MilestoneList from '@/components/milestones/MilestoneList';
 import AwardList from '@/components/awards/AwardList';
+import PaymentList from '@/components/payments/PaymentList';
 import { useAuth } from '@/hooks/use-auth';
 
 type Project = {
@@ -117,7 +118,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <TabsList className="mb-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
-          <TabsTrigger value="awards">Awards</TabsTrigger>
+          <TabsTrigger value="awards">Awards</TabsTrigger>`n          <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="map">Map Summary</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="timeline">Activity Timeline</TabsTrigger>
@@ -176,6 +177,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
         <TabsContent value="awards">
           <AwardList projectId={project.id} />
+        </TabsContent>
+
+        <TabsContent value="payments">
+          <PaymentList projectId={project.id} />
         </TabsContent>
 
         <TabsContent value="map">
