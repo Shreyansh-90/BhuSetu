@@ -3,7 +3,7 @@ import { apiHandler, ApiHandlerContext } from '@/lib/api/handler';
 import { getAuthenticatedUser } from '@/lib/api/auth';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { db } from '@/lib/db';
-import { workflowTasks, projects, userProfiles, auditEvents } from '@/lib/db/schema';
+import { workflowTasks, projects, userProfiles, auditEvents, notifications } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -85,6 +85,25 @@ async function updateTask(request: NextRequest, { logger, params }: ApiHandlerCo
           note: resolution
         }
       });
+
+      // 4. Create Notification for project creator
+      const projectRows = await tx.select({ createdBy: projects.createdBy, title: projects.title })
+        .from(projects)
+        .where(eq(projects.id, task.projectId));
+      
+      if (projectRows.length > 0) {
+        const proj = projectRows[0];
+        await tx.insert(notifications).values({
+          userId: proj.createdBy,
+          title: status === 'approved' 
+            ? `Project "${proj.title}" has been approved` 
+            : `Project "${proj.title}" has been rejected`,
+          message: resolution || undefined,
+          type: 'status_change',
+          entityType: 'project',
+          entityId: task.projectId
+        });
+      }
     }
   });
 

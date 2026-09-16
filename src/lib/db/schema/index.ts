@@ -13,3 +13,4 @@ export * from './spatial';
 export * from './milestones';
 export * from './workflow-tasks';
 export * from './audit-events';
+export * from './notifications';

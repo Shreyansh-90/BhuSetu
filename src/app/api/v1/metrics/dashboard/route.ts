@@ -3,7 +3,7 @@ import { apiHandler, ApiHandlerContext } from '@/lib/api/handler';
 import { getAuthenticatedUser } from '@/lib/api/auth';
 import { successResponse } from '@/lib/api/response';
 import { db } from '@/lib/db';
-import { projects, workflowTasks } from '@/lib/db/schema';
+import { projects, workflowTasks, notifications } from '@/lib/db/schema';
 import { eq, and, not, count } from 'drizzle-orm';
 
 async function getDashboardMetrics(request: NextRequest, { logger }: ApiHandlerContext) {
@@ -24,15 +24,22 @@ async function getDashboardMetrics(request: NextRequest, { logger }: ApiHandlerC
     eq(workflowTasks.status, 'pending')
   ];
 
-  const [activeProjectsRes, pendingTasksRes] = await Promise.all([
+  // Unread Notifications
+  const notifFilters = [
+    eq(notifications.userId, user.id),
+    eq(notifications.isRead, false)
+  ];
+
+  const [activeProjectsRes, pendingTasksRes, unreadNotifsRes] = await Promise.all([
     db.select({ value: count() }).from(projects).where(and(...projectFilters)),
-    db.select({ value: count() }).from(workflowTasks).where(and(...taskFilters))
+    db.select({ value: count() }).from(workflowTasks).where(and(...taskFilters)),
+    db.select({ value: count() }).from(notifications).where(and(...notifFilters))
   ]);
 
   return successResponse({
     activeProjects: activeProjectsRes[0].value,
     pendingTasks: pendingTasksRes[0].value,
-    unreadNotifications: 0 // Placeholder for Phase 4
+    unreadNotifications: unreadNotifsRes[0].value
   });
 }
 
