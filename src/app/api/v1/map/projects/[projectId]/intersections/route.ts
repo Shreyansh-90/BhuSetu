@@ -5,6 +5,15 @@ import { requireMinimumRole } from '@/lib/api/authorize';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { findProjectIntersections } from '@/lib/db/spatial-queries';
 
+function getBaseRate(parcelType: string | null | undefined): number {
+  switch ((parcelType || '').toLowerCase()) {
+    case 'agricultural': return 2000;
+    case 'commercial': return 15000;
+    case 'residential': return 8000;
+    default: return 5000;
+  }
+}
+
 async function getIntersections(
   request: NextRequest,
   context: ApiHandlerContext
@@ -29,6 +38,11 @@ async function getIntersections(
         ? JSON.parse(intersection.intersectionGeojson) 
         : null;
 
+      const ratePerSqm = getBaseRate(intersection.parcelType);
+      const baseCompensation = Math.round(intersection.intersectionAreaSqm * ratePerSqm);
+      const solatium = baseCompensation * 1.0; // 100% statutory solatium
+      const totalCompensation = baseCompensation + solatium;
+
       return {
         type: 'Feature' as const,
         geometry,
@@ -44,6 +58,10 @@ async function getIntersections(
           parcelAreaSqm: intersection.parcelAreaSqm,
           intersectionAreaSqm: intersection.intersectionAreaSqm,
           overlapPercent: intersection.overlapPercent,
+          ratePerSqm,
+          baseCompensation,
+          solatium,
+          estimatedCompensation: totalCompensation,
         },
       };
     }).filter(f => f.geometry !== null);

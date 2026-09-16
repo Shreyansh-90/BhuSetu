@@ -99,6 +99,22 @@ export default function ProjectMapPage({ params }: { params: Promise<{ id: strin
 
         {/* Floating Legend / Info Panel */}
         <div className="w-80 bg-background border-l shadow-xl p-4 overflow-y-auto z-10 flex flex-col gap-6">
+          {/* Summary Card */}
+          {intersectionsGeojson && intersectionsGeojson.features.length > 0 && (
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-2">
+              <h3 className="text-sm font-medium text-primary">Total Estimated Cost</h3>
+              <p className="text-2xl font-bold text-primary">
+                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(
+                  intersectionsGeojson.features.reduce((acc: number, f: any) => acc + (f.properties.estimatedCompensation || 0), 0)
+                )}
+              </p>
+              <p className="text-xs text-muted-foreground flex items-center justify-between">
+                <span>{intersectionsGeojson.features.length} Affected Parcels</span>
+                <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary">Includes 100% Solatium</span>
+              </p>
+            </div>
+          )}
+
           <div>
             <h3 className="font-semibold mb-3">Legend</h3>
             <div className="space-y-2 text-sm">
@@ -123,21 +139,42 @@ export default function ProjectMapPage({ params }: { params: Promise<{ id: strin
               <div className="space-y-2">
                 {intersectionsGeojson.features.map((f: any) => (
                   <Card key={f.properties.parcelId} className="shadow-sm">
-                    <CardHeader className="p-3 pb-1">
+                    <CardHeader className="p-3 pb-1 border-b">
                       <div className="flex justify-between items-start">
-                        <CardTitle className="text-sm font-medium">Survey {f.properties.surveyNumber || "N/A"}</CardTitle>
-                        <Badge variant="outline" className="text-xs capitalize">{f.properties.parcelType}</Badge>
+                        <CardTitle className="text-sm font-medium leading-none">Survey {f.properties.surveyNumber || "N/A"}</CardTitle>
+                        <Badge variant="outline" className="text-xs capitalize h-5">{f.properties.parcelType || 'Unknown'}</Badge>
                       </div>
                     </CardHeader>
-                    <CardContent className="p-3 pt-0 text-xs text-muted-foreground space-y-1">
-                      {user?.role === 'viewer' ? (
-                        <p className="text-foreground">Owner: {f.properties.ownerName || "Unknown"}</p>
-                      ) : (
-                        <p>Owner: {f.properties.ownerName || "Unknown"}</p>
-                      )}
-                      <p>Overlap Area: {f.properties.intersectionAreaSqm.toFixed(2)} sq.m</p>
-                      {f.properties.overlapPercent && (
-                        <p>Impact: {f.properties.overlapPercent.toFixed(1)}% of total parcel</p>
+                    <CardContent className="p-3 text-xs text-muted-foreground space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-foreground">{f.properties.ownerName || "Unknown Owner"}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 bg-muted/30 p-2 rounded">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider">Overlap</p>
+                          <p className="font-medium text-foreground">{f.properties.intersectionAreaSqm.toFixed(1)} sq.m</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider">Impact</p>
+                          <p className="font-medium text-foreground">{f.properties.overlapPercent ? `${f.properties.overlapPercent.toFixed(1)}%` : 'N/A'}</p>
+                        </div>
+                      </div>
+                      
+                      {f.properties.estimatedCompensation && (
+                        <div className="pt-2 border-t mt-2">
+                          <div className="flex justify-between items-center text-[10px]">
+                            <span>Base ({f.properties.ratePerSqm}/sqm)</span>
+                            <span>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(f.properties.baseCompensation)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[10px]">
+                            <span>Solatium (100%)</span>
+                            <span>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(f.properties.solatium)}</span>
+                          </div>
+                          <div className="flex justify-between items-center font-semibold text-sm text-primary mt-1">
+                            <span>Total</span>
+                            <span>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(f.properties.estimatedCompensation)}</span>
+                          </div>
+                        </div>
                       )}
                     </CardContent>
                   </Card>
