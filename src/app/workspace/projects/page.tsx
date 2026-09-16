@@ -97,7 +97,7 @@ export default function ProjectsPage() {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={6} className="h-48 text-center text-muted-foreground">
-                    <div className="animate-pulse flex flex-col items-center justify-center gap-3">
+                    <div className="animate-pulse flex flex-col items-center justify-center gap-3" role="status" aria-live="polite">
                       <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                       <span className="font-medium text-sm">Loading projects...</span>
                     </div>

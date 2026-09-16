@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
+import { useMetrics } from '@/hooks/use-metrics';
 import { FileText, LayoutDashboard, Map, Settings, ListTodo, Bell } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
@@ -18,6 +19,7 @@ interface SidebarItem {
 export function Sidebar() {
   const pathname = usePathname();
   const { user, canSubmitProposals, canApproveProposals, canViewNationalDashboard } = useAuth();
+  const { metrics } = useMetrics();
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -33,7 +35,7 @@ export function Sidebar() {
     { name: 'National Dashboard', href: '/workspace/national', icon: LayoutDashboard, show: canViewNationalDashboard },
     { name: 'Projects', href: '/workspace/projects', icon: Map, show: true },
     { name: 'My Tasks', href: '/workspace/tasks', icon: ListTodo, show: canApproveProposals },
-    { name: 'Notifications', href: '/workspace/notifications', icon: Bell, show: true, badge: 3 }, // Example badge
+    { name: 'Notifications', href: '/workspace/notifications', icon: Bell, show: true, badge: metrics.unreadNotifications },
   ];
 
   const managementItems: SidebarItem[] = [
@@ -65,7 +67,7 @@ export function Sidebar() {
                 <item.icon className={cn("h-5 w-5", isActive ? "text-accent" : "text-muted-foreground")} />
                 {item.name}
               </div>
-              {item.badge && (
+              {item.badge !== undefined && item.badge > 0 && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
                   {item.badge}
                 </span>

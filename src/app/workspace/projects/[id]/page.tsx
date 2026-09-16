@@ -12,6 +12,7 @@ import EditProjectDialog from '@/components/projects/EditProjectDialog';
 import ClarificationDialog from '@/components/projects/ClarificationDialog';
 import { useAuth } from '@/hooks/use-auth';
 import { Info, Map as MapIcon, FileText, Clock, Building2, Calendar, MapPin, Tag, PlusCircle } from 'lucide-react';
+import ProjectTimeline from './ProjectTimeline';
 
 type Project = {
   id: string;
@@ -86,7 +87,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 w-full">
+      <div className="flex items-center justify-center h-64 w-full" role="status" aria-live="polite">
         <div className="animate-pulse flex flex-col items-center gap-4 text-muted-foreground">
           <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="font-medium">Loading project dossier...</p>
@@ -305,45 +306,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           </TabsContent>
 
           <TabsContent value="timeline" className="m-0 focus-visible:outline-none">
-            <Card className="shadow-sm border-border/50">
-              <CardHeader className="border-b border-border/50">
-                <CardTitle>Activity Audit Trail</CardTitle>
-                <CardDescription>Immutable log of workflow changes and approvals.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
-                  
-                  {project.status !== 'draft' && (
-                    <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-background bg-blue-100 text-blue-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                        <FileText className="h-4 w-4" />
-                      </div>
-                      <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-border shadow-sm bg-card">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-blue-600">Project Submitted</span>
-                          <span className="text-xs font-medium text-muted-foreground">Recent</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">Moved to workflow review by acquiring authority.</p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-background bg-muted text-muted-foreground shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                      <PlusCircle className="h-4 w-4" />
-                    </div>
-                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-border shadow-sm bg-card">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-foreground">Project Draft Created</span>
-                        <span className="text-xs font-medium text-muted-foreground">{format(new Date(project.createdAt), 'MMM d, yyyy')}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">Initial dossier generated in the system.</p>
-                    </div>
-                  </div>
-
-                </div>
-              </CardContent>
-            </Card>
+            <ProjectTimeline projectId={project.id} />
           </TabsContent>
         </div>
       </Tabs>

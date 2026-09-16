@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
 import { Menu, LogOut, Landmark, LayoutDashboard, Map, Settings, ListTodo, FileText, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,14 +15,21 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/use-auth';
+import { useMetrics } from '@/hooks/use-metrics';
 import { signOutAction } from '@/app/actions/auth';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export function Header() {
   const { isAuthenticated, user, canViewWorkspace } = useAuth();
+  const { metrics } = useMetrics();
   const router = useRouter();
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   const handleSignOut = async () => {
     await signOutAction();
@@ -53,7 +61,7 @@ export function Header() {
           
           {/* Mobile Nav */}
           <div className="md:hidden mr-4">
-            <Sheet>
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger>
                 <Button variant="ghost" size="icon" aria-label="Open menu">
                   <Menu className="h-5 w-5" />
@@ -93,7 +101,11 @@ export function Header() {
                       <div className="flex items-center gap-3">
                         <Bell className="h-5 w-5" /> Notifications
                       </div>
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">3</span>
+                      {metrics.unreadNotifications > 0 && (
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                          {metrics.unreadNotifications}
+                        </span>
+                      )}
                     </Link>
                   )}
                 </div>
