@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
@@ -117,11 +117,15 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="mb-4">`n          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+      <Tabs defaultValue="overview" className="w-full flex-col">
+        <TabsList className="mb-4 flex-wrap h-auto justify-start">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
-          <TabsTrigger value="awards">Awards</TabsTrigger>`n          <TabsTrigger value="payments">Payments</TabsTrigger>`n          <TabsTrigger value="rr">R&&R</TabsTrigger>`n          <TabsTrigger value="closure" className="text-rose-600 data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-900/30">Closure</TabsTrigger>
+          <TabsTrigger value="awards">Awards</TabsTrigger>
+          <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="rr">R&R</TabsTrigger>
+          <TabsTrigger value="closure" className="text-rose-600 data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-900/30">Closure</TabsTrigger>
           <TabsTrigger value="map">Map Summary</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="timeline">Activity Timeline</TabsTrigger>
