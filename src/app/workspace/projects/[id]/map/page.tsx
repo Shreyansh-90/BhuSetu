@@ -37,7 +37,7 @@ export default function ProjectMapPage({ params }: { params: Promise<{ id: strin
         }
 
         // 2. Fetch Intersections
-        const intRes = await fetch(`/api/v1/projects/${resolvedParams.id}/intersections`);
+        const intRes = await fetch(`/api/v1/map/projects/${resolvedParams.id}/intersections`);
         if (intRes.ok) {
           const json = await intRes.json();
           setIntersectionsGeojson(json.data);
