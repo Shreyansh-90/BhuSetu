@@ -178,7 +178,9 @@ export default function AwardList({ projectId }: { projectId: string }) {
             <TableHeader>
               <TableRow className="bg-muted/40 hover:bg-muted/40">
                 <TableHead className="font-semibold text-foreground">Parcel ID</TableHead>
-                <TableHead className="font-semibold text-foreground">Assessed Amount</TableHead>
+                <TableHead className="font-semibold text-foreground">Base Amount</TableHead>
+                <TableHead className="font-semibold text-foreground">Solatium</TableHead>
+                <TableHead className="font-semibold text-foreground">Total Assessed</TableHead>
                 <TableHead className="font-semibold text-foreground">Award Date</TableHead>
                 <TableHead className="font-semibold text-foreground">Status</TableHead>
                 <TableHead className="font-semibold text-foreground">Created</TableHead>
@@ -205,7 +207,13 @@ export default function AwardList({ projectId }: { projectId: string }) {
                           {truncateUuid(award.parcelId)}
                         </span>
                       </TableCell>
-                      <TableCell className="font-medium tabular-nums">
+                      <TableCell className="font-medium tabular-nums text-muted-foreground text-sm">
+                        {formatCurrency(award.baseAmount)}
+                      </TableCell>
+                      <TableCell className="font-medium tabular-nums text-muted-foreground text-sm">
+                        {formatCurrency(award.solatiumAmount)}
+                      </TableCell>
+                      <TableCell className="font-medium tabular-nums text-primary">
                         {formatCurrency(award.assessedAmount)}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">

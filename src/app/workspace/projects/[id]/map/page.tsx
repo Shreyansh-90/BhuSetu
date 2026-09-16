@@ -9,6 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+
 export default function ProjectMapPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const { user } = useAuth();
@@ -16,6 +19,24 @@ export default function ProjectMapPage({ params }: { params: Promise<{ id: strin
   const [intersectionsGeojson, setIntersectionsGeojson] = useState<GeoJSON.FeatureCollection | null>(null);
   const [parcelsGeojson, setParcelsGeojson] = useState<GeoJSON.FeatureCollection | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerateAwards = async () => {
+    if (!confirm("Are you sure you want to generate draft awards for all affected parcels?")) return;
+    setIsGenerating(true);
+    try {
+      const res = await fetch(`/api/v1/projects/${resolvedParams.id}/awards/generate`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || "Failed to generate awards");
+      alert(data.data.message);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   // Load project geometry and intersections once on mount
   useEffect(() => {
@@ -101,17 +122,30 @@ export default function ProjectMapPage({ params }: { params: Promise<{ id: strin
         <div className="w-80 bg-background border-l shadow-xl p-4 overflow-y-auto z-10 flex flex-col gap-6">
           {/* Summary Card */}
           {intersectionsGeojson && intersectionsGeojson.features.length > 0 && (
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-2">
-              <h3 className="text-sm font-medium text-primary">Total Estimated Cost</h3>
-              <p className="text-2xl font-bold text-primary">
-                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(
-                  intersectionsGeojson.features.reduce((acc: number, f: any) => acc + (f.properties.estimatedCompensation || 0), 0)
-                )}
-              </p>
-              <p className="text-xs text-muted-foreground flex items-center justify-between">
-                <span>{intersectionsGeojson.features.length} Affected Parcels</span>
-                <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary">Includes 100% Solatium</span>
-              </p>
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-3">
+              <div>
+                <h3 className="text-sm font-medium text-primary">Total Estimated Cost</h3>
+                <p className="text-2xl font-bold text-primary">
+                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(
+                    intersectionsGeojson.features.reduce((acc: number, f: any) => acc + (f.properties.estimatedCompensation || 0), 0)
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground flex items-center justify-between mt-1">
+                  <span>{intersectionsGeojson.features.length} Affected Parcels</span>
+                  <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary">Includes 100% Solatium</span>
+                </p>
+              </div>
+              
+              {user?.role === 'project_manager' || user?.role === 'admin' ? (
+                <Button 
+                  className="w-full" 
+                  onClick={handleGenerateAwards} 
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {isGenerating ? 'Generating...' : 'Generate Official Awards'}
+                </Button>
+              ) : null}
             </div>
           )}
 

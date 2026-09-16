@@ -371,7 +371,13 @@ export const awards = pgTable('awards', {
   id: uuid('id').primaryKey().defaultRandom(),
   projectId: uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
   parcelId: uuid('parcel_id').notNull().references(() => parcels.id, { onDelete: 'cascade' }),
+  
+  // Detailed compensation breakdown
+  baseAmount: doublePrecision('base_amount'),
+  solatiumAmount: doublePrecision('solatium_amount'),
+  multiplierUsed: doublePrecision('multiplier_used').default(1.0),
   assessedAmount: doublePrecision('assessed_amount'),
+
   awardDate: date('award_date'),
   status: awardStatusEnum('status').notNull().default('draft'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

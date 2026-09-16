@@ -7,6 +7,9 @@ export const AwardResponseSchema = z.object({
   id: z.string().uuid(),
   projectId: z.string().uuid(),
   parcelId: z.string().uuid(),
+  baseAmount: z.number().nullable(),
+  solatiumAmount: z.number().nullable(),
+  multiplierUsed: z.number().nullable(),
   assessedAmount: z.number().nullable(),
   awardDate: z.string().nullable(),
   status: AwardStatusSchema,
@@ -18,6 +21,9 @@ export const AwardListResponseSchema = z.array(AwardResponseSchema);
 
 export const CreateAwardRequestSchema = z.object({
   parcelId: z.string().uuid(),
+  baseAmount: z.number().nonnegative().optional(),
+  solatiumAmount: z.number().nonnegative().optional(),
+  multiplierUsed: z.number().nonnegative().optional(),
   assessedAmount: z.number().nonnegative().optional(),
   awardDate: z.string().optional(),
   status: AwardStatusSchema.optional(),

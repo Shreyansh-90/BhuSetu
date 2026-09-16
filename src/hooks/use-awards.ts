@@ -8,6 +8,9 @@ export type Award = {
   id: string;
   projectId: string;
   parcelId: string;
+  baseAmount: number | null;
+  solatiumAmount: number | null;
+  multiplierUsed: number | null;
   assessedAmount: number | null;
   awardDate: string | null;
   status: AwardStatus;

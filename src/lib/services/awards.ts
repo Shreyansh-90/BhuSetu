@@ -32,6 +32,9 @@ export class AwardService {
       .values({
         projectId: projectId,
         parcelId: data.parcelId,
+        baseAmount: data.baseAmount ?? null,
+        solatiumAmount: data.solatiumAmount ?? null,
+        multiplierUsed: data.multiplierUsed ?? 1.0,
         assessedAmount: data.assessedAmount ?? null,
         awardDate: data.awardDate ?? null,
         status: data.status ?? 'draft',
@@ -45,5 +48,35 @@ export class AwardService {
       createdAt: created.createdAt.toISOString(),
       updatedAt: created.updatedAt.toISOString(),
     };
+  }
+
+  /**
+   * Batch create awards (useful for generating drafts from map intersections)
+   */
+  static async createAwardsBatch(projectId: string, dataList: CreateAwardRequest[]): Promise<AwardResponse[]> {
+    if (dataList.length === 0) return [];
+    
+    const values = dataList.map(data => ({
+      projectId: projectId,
+      parcelId: data.parcelId,
+      baseAmount: data.baseAmount ?? null,
+      solatiumAmount: data.solatiumAmount ?? null,
+      multiplierUsed: data.multiplierUsed ?? 1.0,
+      assessedAmount: data.assessedAmount ?? null,
+      awardDate: data.awardDate ?? null,
+      status: data.status ?? 'draft',
+    }));
+
+    const results = await db
+      .insert(awards)
+      .values(values)
+      .returning();
+
+    return results.map(created => ({
+      ...created,
+      awardDate: created.awardDate ? created.awardDate : null,
+      createdAt: created.createdAt.toISOString(),
+      updatedAt: created.updatedAt.toISOString(),
+    }));
   }
 }
