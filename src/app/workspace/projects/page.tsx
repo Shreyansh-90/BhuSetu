@@ -10,6 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableEmptyState
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,14 +54,14 @@ export default function ProjectsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'draft':
-        return <Badge variant="secondary">Draft</Badge>;
+        return <Badge variant="draft" showDot>Draft</Badge>;
       case 'submitted':
       case 'under_scrutiny':
-        return <Badge variant="outline" className="text-blue-500 border-blue-500">In Review</Badge>;
+        return <Badge variant="pending" showDot>In Review</Badge>;
       case 'approved':
-        return <Badge variant="default" className="bg-green-600">Approved</Badge>;
+        return <Badge variant="success" showDot>Approved</Badge>;
       default:
-        return <Badge variant="outline">{status.replace('_', ' ')}</Badge>;
+        return <Badge variant="outline" showDot>{status.replace('_', ' ')}</Badge>;
     }
   };
 
@@ -77,10 +78,10 @@ export default function ProjectsPage() {
       </div>
 
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-3 border-b">
           <CardTitle>All Projects</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -95,24 +96,23 @@ export default function ProjectsPage() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                    Loading projects...
+                  <TableCell colSpan={6} className="h-48 text-center text-muted-foreground">
+                    <div className="animate-pulse flex flex-col items-center justify-center gap-3">
+                      <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      <span className="font-medium text-sm">Loading projects...</span>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : projects.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                    No projects found.
-                  </TableCell>
-                </TableRow>
+                <TableEmptyState colSpan={6} message="No projects found. Create one to get started." />
               ) : (
                 projects.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{p.title}</TableCell>
-                    <TableCell>{p.stateCode} / {p.districtCode}</TableCell>
-                    <TableCell className="capitalize">{p.category}</TableCell>
+                    <TableCell className="text-muted-foreground">{p.stateCode} / {p.districtCode}</TableCell>
+                    <TableCell className="capitalize text-muted-foreground">{p.category}</TableCell>
                     <TableCell>{getStatusBadge(p.status)}</TableCell>
-                    <TableCell>{format(new Date(p.createdAt), 'MMM d, yyyy')}</TableCell>
+                    <TableCell className="text-muted-foreground">{format(new Date(p.createdAt), 'MMM d, yyyy')}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm" onClick={() => router.push(`/workspace/projects/${p.id}`)}>
                         View
