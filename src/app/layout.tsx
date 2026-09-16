@@ -7,22 +7,20 @@ import "./globals.css";
 
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-<<<<<<< HEAD
   title: "BhuSetu | National Land Acquisition & Management Platform",
-  description: "National unified land-acquisition and project monitoring platform",
-=======
-  title: "BhuSetu - Land Acquisition",
-  description: "National Land Acquisition and Monitoring System",
->>>>>>> 5d3be0bcb3eb744a263dc020715cff6274de3d27
+  description: "National unified platform for transparent, efficient, and auditable land acquisition workflows.",
 };
 
 export default async function RootLayout({
@@ -33,19 +31,14 @@ export default async function RootLayout({
   const capabilities = await getUserCapabilities();
 
   return (
-<<<<<<< HEAD
     <html lang="en" className={`${notoSans.variable} ${jetbrainsMono.variable}`}>
-      <body className="antialiased font-sans">{children}</body>
-=======
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>
+      <body className="antialiased font-sans">
         <AuthProvider capabilities={capabilities}>
           <AppShell>
             {children}
           </AppShell>
         </AuthProvider>
       </body>
->>>>>>> 5d3be0bcb3eb744a263dc020715cff6274de3d27
     </html>
   );
 }
