@@ -118,15 +118,15 @@ export default function DashboardData() {
               </Card>
             </Link>
 
-            <Link href="/workspace/documents">
+            <Link href="/citizen/track">
               <Card className="group cursor-pointer hover:border-success/50 transition-colors shadow-sm">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="p-3 bg-success/10 text-success rounded-xl group-hover:scale-110 transition-transform">
                     <FileText className="h-6 w-6" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-bold">Document Archive</span>
-                    <span className="text-sm text-muted-foreground">Access official records and maps</span>
+                    <span className="font-bold">Public Portal</span>
+                    <span className="text-sm text-muted-foreground">Access the citizen tracking portal</span>
                   </div>
                 </CardContent>
               </Card>

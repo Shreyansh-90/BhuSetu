@@ -114,8 +114,8 @@ export function Header() {
                   <div className="flex flex-col gap-1 mb-6">
                     <h4 className="px-2 text-xs font-semibold text-muted-foreground tracking-wider mb-2">MANAGEMENT</h4>
                     
-                    <Link href="/workspace/documents" className={cn("flex items-center gap-3 px-3 py-2.5 text-[15px] font-medium transition-all rounded-md", pathname.startsWith('/workspace/documents') ? "bg-accent/10 text-accent font-semibold" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground")}>
-                      <FileText className="h-5 w-5" /> Documents
+                    <Link href="/citizen/track" className={cn("flex items-center gap-3 px-3 py-2.5 text-[15px] font-medium transition-all rounded-md", pathname.startsWith('/citizen/track') ? "bg-accent/10 text-accent font-semibold" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground")}>
+                      <FileText className="h-5 w-5" /> Public Portal
                     </Link>
                     
                     <Link href="/workspace/settings" className={cn("flex items-center gap-3 px-3 py-2.5 text-[15px] font-medium transition-all rounded-md", pathname.startsWith('/workspace/settings') ? "bg-accent/10 text-accent font-semibold" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground")}>

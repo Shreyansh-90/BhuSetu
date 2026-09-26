@@ -9,6 +9,7 @@ import { projects, auditEvents, workflowTasks } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { extractClientIp } from '@/lib/api/utils';
+import { getStage } from '@/lib/workflow/state-machine';
 
 const paramSchema = z.object({
   projectId: z.string().uuid(),
@@ -63,15 +64,23 @@ async function submitProject(request: NextRequest, { logger, params }: ApiHandle
         .where(eq(projects.id, projectId))
         .returning();
 
+      const stage = getStage('submitted');
+      const taskValues = stage ? {
+        title: stage.taskTitle,
+        description: stage.taskDescription,
+        dueDate: new Date(Date.now() + stage.slaDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      } : {
+        title: 'Initial Scrutiny',
+        description: 'Review the newly submitted project proposal.',
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      };
+
       // 2. Create workflow task for scrutiny
       const [task] = await tx.insert(workflowTasks).values({
         projectId: project.id,
-        title: 'Initial Scrutiny',
-        description: 'Review the newly submitted project proposal.',
         status: 'pending',
         assignedBy: user.id,
-        // Optional: calculate a due date based on SLA
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 
+        ...taskValues,
       }).returning();
 
       // 3. Create audit event

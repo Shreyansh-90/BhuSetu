@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { useMetrics } from '@/hooks/use-metrics';
-import { FileText, LayoutDashboard, Map, Settings, ListTodo, Bell } from 'lucide-react';
+import { LayoutDashboard, Map, Settings, ListTodo, Bell, Globe } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface SidebarItem {
@@ -39,7 +39,7 @@ export function Sidebar() {
   ];
 
   const managementItems: SidebarItem[] = [
-    { name: 'Documents', href: '/workspace/documents', icon: FileText, show: true },
+    { name: 'Public Portal', href: '/citizen/track', icon: Globe, show: true },
     { name: 'Settings', href: '/workspace/settings', icon: Settings, show: true },
   ];
 

@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, doublePrecision, date, boolean, timestamp, customType } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, doublePrecision, date, boolean, timestamp, customType, index } from 'drizzle-orm/pg-core';
 import { geometryVerificationStatusEnum } from './enums';
 import { projects } from './projects';
 import { parcels } from './parcels';
@@ -29,6 +29,10 @@ export const projectGeometries = pgTable('project_geometries', {
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => {
+  return {
+    spatialIndex: index('project_geom_gist_idx').using('gist', table.geometry),
+  };
 });
 
 export const parcelGeometries = pgTable('parcel_geometries', {
@@ -47,4 +51,8 @@ export const parcelGeometries = pgTable('parcel_geometries', {
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => {
+  return {
+    spatialIndex: index('parcel_geom_gist_idx').using('gist', table.geometry),
+  };
 });

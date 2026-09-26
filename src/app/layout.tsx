@@ -1,6 +1,8 @@
 import { getUserCapabilities } from "./actions/auth";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AppShell } from "@/components/layout/AppShell";
+import PwaRegistry from "@/components/PwaRegistry";
+import { OfflineSyncUI } from "@/components/pwa/OfflineSyncUI";
 import type { Metadata } from "next";
 import { Noto_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
@@ -34,6 +36,8 @@ export default async function RootLayout({
     <html lang="en" className={`${notoSans.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased font-sans">
         <AuthProvider capabilities={capabilities}>
+          <PwaRegistry />
+          <OfflineSyncUI />
           <AppShell>
             {children}
           </AppShell>

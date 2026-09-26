@@ -5,6 +5,7 @@ import { projects } from './projects';
 
 export const parcels = pgTable('parcels', {
   id: uuid('id').primaryKey().defaultRandom(),
+  ulpin: text('ulpin').unique(), // 14-digit alphanumeric Bhu-Aadhaar
   surveyNumber: text('survey_number'),
   village: text('village'),
   tehsil: text('tehsil'),

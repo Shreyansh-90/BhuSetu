@@ -25,7 +25,8 @@ async function markAsRead(request: NextRequest, { logger, params }: ApiHandlerCo
   return successResponse({ success: true });
 }
 
-async function markAllAsRead(request: NextRequest, { logger, params }: ApiHandlerContext) {
+async function markAllAsRead(request: NextRequest, ctx: ApiHandlerContext) {
+  const { logger, params } = ctx;
   const authResult = await getAuthenticatedUser(logger);
   if (!authResult.success) return authResult.response;
   const user = authResult.user;
@@ -44,7 +45,7 @@ async function markAllAsRead(request: NextRequest, { logger, params }: ApiHandle
   }
 
   // Normal case: mark single notification as read
-  return markAsRead(request, { logger, params });
+  return markAsRead(request, ctx);
 }
 
 export const PATCH = apiHandler(markAllAsRead);

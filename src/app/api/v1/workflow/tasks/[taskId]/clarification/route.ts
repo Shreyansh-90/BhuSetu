@@ -10,6 +10,7 @@ import { clarificationSchema } from '@/lib/dtos/workflow';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { extractClientIp } from '@/lib/api/utils';
+import { getNextStatus, getStage } from '@/lib/workflow/state-machine';
 
 const paramSchema = z.object({
   taskId: z.string().uuid(),
@@ -78,6 +79,26 @@ async function addClarification(request: NextRequest, { logger, params }: ApiHan
         .where(eq(workflowTasks.id, taskId))
         .returning();
 
+      // Transition project status back to under_scrutiny
+      const nextProjectStatus = getNextStatus(project.status, 'approve');
+      if (nextProjectStatus) {
+        await tx.update(projects)
+          .set({ status: nextProjectStatus, updatedAt: new Date() })
+          .where(eq(projects.id, project.id));
+          
+        const nextStage = getStage(nextProjectStatus);
+        if (nextStage) {
+          await tx.insert(workflowTasks).values({
+            projectId: project.id,
+            title: nextStage.taskTitle,
+            description: nextStage.taskDescription,
+            status: 'pending',
+            assignedBy: user.id,
+            dueDate: new Date(Date.now() + nextStage.slaDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          });
+        }
+      }
+
       await tx.insert(auditEvents).values({
         eventType: 'workflow_task_clarification',
         entityType: 'workflow_task',
@@ -85,8 +106,8 @@ async function addClarification(request: NextRequest, { logger, params }: ApiHan
         actorId: user.id,
         actorRole: user.role,
         actorIp: extractClientIp(request),
-        oldValues: { status: task.status, resolution: task.resolution },
-        newValues: { status: 'completed', resolution: body.resolution },
+        oldValues: { status: task.status, resolution: task.resolution, projectStatus: project.status },
+        newValues: { status: 'completed', resolution: body.resolution, projectStatus: nextProjectStatus },
         metadata: { projectId: task.projectId },
       });
 

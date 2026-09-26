@@ -31,8 +31,10 @@ export default function ProjectTimeline({ projectId }: { projectId: string }) {
       case 'project_created': return <PlusCircle className="h-4 w-4" />;
       case 'status_updated': return <Activity className="h-4 w-4" />;
       case 'project_submitted': return <FileText className="h-4 w-4" />;
-      case 'task_approved': return <CheckCircle2 className="h-4 w-4" />;
-      case 'task_rejected': return <XCircle className="h-4 w-4" />;
+      case 'task_approved':
+      case 'stage_approved': return <CheckCircle2 className="h-4 w-4" />;
+      case 'task_rejected':
+      case 'stage_rejected': return <XCircle className="h-4 w-4" />;
       default: return <Activity className="h-4 w-4" />;
     }
   };
@@ -41,8 +43,10 @@ export default function ProjectTimeline({ projectId }: { projectId: string }) {
     switch (eventType) {
       case 'project_created': return 'bg-muted text-muted-foreground border-background';
       case 'project_submitted': return 'bg-blue-100 text-blue-600 border-background';
-      case 'task_approved': return 'bg-success/20 text-success border-background';
-      case 'task_rejected': return 'bg-destructive/20 text-destructive border-background';
+      case 'task_approved':
+      case 'stage_approved': return 'bg-success/20 text-success border-background';
+      case 'task_rejected':
+      case 'stage_rejected': return 'bg-destructive/20 text-destructive border-background';
       default: return 'bg-accent/20 text-accent border-background';
     }
   };

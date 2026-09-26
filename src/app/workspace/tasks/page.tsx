@@ -51,6 +51,7 @@ export default function TasksPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line
     fetchTasks();
   }, []);
 

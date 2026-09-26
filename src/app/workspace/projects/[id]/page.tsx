@@ -11,8 +11,14 @@ import SubmitProjectDialog from '@/components/projects/SubmitProjectDialog';
 import EditProjectDialog from '@/components/projects/EditProjectDialog';
 import ClarificationDialog from '@/components/projects/ClarificationDialog';
 import { useAuth } from '@/hooks/use-auth';
-import { Info, Map as MapIcon, FileText, Clock, Building2, Calendar, MapPin, Tag, PlusCircle } from 'lucide-react';
+import { Info, Map as MapIcon, FileText, Clock, Building2, Calendar, MapPin, Tag, Calculator } from 'lucide-react';
 import ProjectTimeline from './ProjectTimeline';
+import ProjectParcels from './ProjectParcels';
+import ProjectCompensation from './ProjectCompensation';
+import ProjectRehabilitation from './ProjectRehabilitation';
+import ProjectDocuments from './ProjectDocuments';
+
+import { LifecycleStepper } from '@/components/projects/LifecycleStepper';
 
 type Project = {
   id: string;
@@ -40,6 +46,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { canSubmitProposals, canViewWorkspace } = useAuth();
+  const [spatialData, setSpatialData] = useState<{ projectGeometry: any, parcelGeometries: any[] } | null>(null);
+  const [spatialLoading, setSpatialLoading] = useState(true);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -58,7 +66,24 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         setLoading(false);
       }
     };
+
+    const fetchSpatialData = async () => {
+      setSpatialLoading(true);
+      try {
+        const res = await fetch(`/api/v1/projects/${resolvedParams.id}/spatial`);
+        if (res.ok) {
+          const json = await res.json();
+          setSpatialData(json.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch spatial data', err);
+      } finally {
+        setSpatialLoading(false);
+      }
+    };
+
     fetchProject();
+    fetchSpatialData();
   }, [resolvedParams.id]);
 
   const getStatusBadge = (status: string) => {
@@ -75,15 +100,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     }
   };
 
-  const getProgressPercentage = (status: string) => {
-    switch (status) {
-      case 'draft': return 20;
-      case 'submitted': return 40;
-      case 'under_scrutiny': return 60;
-      case 'approved': return 100;
-      default: return 0;
-    }
-  };
+
 
   if (loading) {
     return (
@@ -107,7 +124,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     );
   }
 
-  const progress = getProgressPercentage(project.status);
+
 
   return (
     <div className="flex flex-col gap-8 w-full max-w-7xl mx-auto py-2">
@@ -165,23 +182,15 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               <div className="flex items-center gap-3">
                 <Building2 className="h-5 w-5 text-muted-foreground" />
                 <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Acquiring Authority</span>
-                  <span className="text-sm font-medium">Ministry of Rural Development</span>
+                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Category</span>
+                  <span className="text-sm font-medium capitalize">{project.category}</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 mt-2">
-              <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <span>Lifecycle Progress</span>
-                <span className={progress === 100 ? "text-success" : "text-primary"}>{progress}% Complete</span>
-              </div>
-              <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden">
-                <div 
-                  className={`h-full rounded-full transition-all duration-1000 ease-in-out ${progress === 100 ? 'bg-success' : 'bg-primary'}`}
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
+            {/* Lifecycle Stepper replaced the generic progress bar */}
+            <div className="mt-4 pt-4 border-t border-border/50">
+              <LifecycleStepper currentStatus={project.status} activeTask={project.activeTask} />
             </div>
 
           </div>
@@ -200,10 +209,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           </TabsTrigger>
 
           <TabsTrigger 
-            value="map" 
+            value="spatial" 
             className="rounded-none border-b-2 border-transparent py-4 px-6 font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-4 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
           >
-            <MapIcon className="h-4 w-4" /> Map Summary
+            <MapIcon className="h-4 w-4" /> Spatial & Parcels
           </TabsTrigger>
 
           <TabsTrigger 
@@ -212,6 +221,17 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           >
             <FileText className="h-4 w-4" /> Documents
           </TabsTrigger>
+
+
+
+          <TabsTrigger 
+            value="financials" 
+            className="rounded-none border-b-2 border-transparent py-4 px-6 font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-4 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
+          >
+            <Calculator className="h-4 w-4" /> Financials & R&R
+          </TabsTrigger>
+
+
 
           <TabsTrigger 
             value="timeline" 
@@ -268,45 +288,30 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                     <div className="flex items-center gap-2 font-medium text-foreground">
                       <Info className="h-4 w-4 text-primary" /> Note
                     </div>
-                    Detailed village-level schedules and polygon data are available under the Map Summary tab once submitted.
+                    Detailed village-level schedules and polygon data are available under the Spatial & Parcels tab once submitted.
                   </div>
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
 
-          <TabsContent value="map" className="m-0 focus-visible:outline-none">
-            <Card className="shadow-sm border-border/50">
-              <CardHeader className="border-b border-border/50">
-                <CardTitle>Geospatial Intersection Map</CardTitle>
-                <CardDescription>Visual summary of the public land intersection and cadastral boundaries.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="h-96 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center text-muted-foreground bg-muted/10 gap-4">
-                  <MapIcon className="h-12 w-12 opacity-20" />
-                  <span className="font-medium">[Map Integration Paused - F2/F3 Pending]</span>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="spatial" className="m-0 focus-visible:outline-none">
+            <ProjectParcels projectId={project.id} projectStatus={project.status} spatialData={spatialData} spatialLoading={spatialLoading} />
           </TabsContent>
 
           <TabsContent value="documents" className="m-0 focus-visible:outline-none">
-            <Card className="shadow-sm border-border/50">
-              <CardHeader className="border-b border-border/50">
-                <CardTitle>Evidence & Documents</CardTitle>
-                <CardDescription>Official notices, cadastral maps, and land schedules.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="h-64 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center text-muted-foreground bg-muted/10 gap-4">
-                  <FileText className="h-12 w-12 opacity-20" />
-                  <span className="font-medium">[Document Management Paused - F5 Pending]</span>
-                </div>
-              </CardContent>
-            </Card>
+            <ProjectDocuments projectId={project.id} projectStatus={project.status} />
           </TabsContent>
 
           <TabsContent value="timeline" className="m-0 focus-visible:outline-none">
             <ProjectTimeline projectId={project.id} />
+          </TabsContent>
+
+
+
+          <TabsContent value="financials" className="m-0 focus-visible:outline-none flex flex-col gap-6">
+            <ProjectCompensation projectId={project.id} projectStatus={project.status} />
+            <ProjectRehabilitation projectId={project.id} />
           </TabsContent>
         </div>
       </Tabs>
