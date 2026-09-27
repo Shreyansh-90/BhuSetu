@@ -29,8 +29,18 @@ async function listProjects(request: NextRequest, { logger }: ApiHandlerContext)
 
   // Enforce administrative scope
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode) filters.push(eq(projects.stateCode, user.stateCode));
-    if (user.districtCode) filters.push(eq(projects.districtCode, user.districtCode));
+    if (!user.stateCode) {
+      filters.push(eq(projects.stateCode, 'NO_ACCESS'));
+    } else {
+      filters.push(eq(projects.stateCode, user.stateCode));
+    }
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode) {
+        filters.push(eq(projects.districtCode, 'NO_ACCESS'));
+      } else {
+        filters.push(eq(projects.districtCode, user.districtCode));
+      }
+    }
   }
 
   if (query.status) filters.push(eq(projects.status, query.status));
@@ -79,11 +89,13 @@ async function createProject(request: NextRequest, { logger }: ApiHandlerContext
 
   // Enforce scope: user cannot create project in state/district they don't have access to
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && body.stateCode !== user.stateCode) {
+    if (!user.stateCode || body.stateCode !== user.stateCode) {
       return errorResponse('FORBIDDEN', 'You cannot create projects outside your assigned state.');
     }
-    if (user.districtCode && body.districtCode !== user.districtCode) {
-      return errorResponse('FORBIDDEN', 'You cannot create projects outside your assigned district.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || body.districtCode !== user.districtCode) {
+        return errorResponse('FORBIDDEN', 'You cannot create projects outside your assigned district.');
+      }
     }
   }
 

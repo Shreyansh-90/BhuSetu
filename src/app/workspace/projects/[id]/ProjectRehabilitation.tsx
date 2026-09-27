@@ -209,7 +209,7 @@ export default function ProjectRehabilitation({ projectId }: { projectId: string
       </CardHeader>
       <CardContent className="p-0">
         {records.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground flex flex-col items-center justify-center gap-2">
+          <div className="p-4 sm:p-5 text-center text-muted-foreground flex flex-col items-center justify-center gap-2">
             <Users className="h-10 w-10 opacity-20" />
             <p>No R&R records found for this project.</p>
           </div>
@@ -218,37 +218,37 @@ export default function ProjectRehabilitation({ projectId }: { projectId: string
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-muted-foreground uppercase bg-muted/20 border-b border-border/50">
                 <tr>
-                  <th className="px-6 py-4 font-semibold">Family Head</th>
-                  <th className="px-6 py-4 font-semibold">Category</th>
-                  <th className="px-6 py-4 font-semibold text-center">Housing</th>
-                  <th className="px-6 py-4 font-semibold text-center">Employment / Annuity</th>
-                  <th className="px-6 py-4 font-semibold text-right">Allowance (₹)</th>
-                  <th className="px-6 py-4 font-semibold text-center">Status</th>
+                  <th className="px-4 py-2 text-sm font-semibold">Family Head</th>
+                  <th className="px-4 py-2 text-sm font-semibold">Category</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-center">Housing</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-center">Employment / Annuity</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-right">Allowance (₹)</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-center">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 {records.map((record) => (
                   <tr key={record.id} className="hover:bg-muted/5 transition-colors">
-                    <td className="px-6 py-4 font-medium">{record.familyHeadName}</td>
-                    <td className="px-6 py-4 capitalize">{record.category}</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-4 py-2 text-sm font-medium">{record.familyHeadName}</td>
+                    <td className="px-4 py-2 text-sm capitalize">{record.category}</td>
+                    <td className="px-4 py-2 text-sm text-center">
                       {record.housingProvided ? (
                         <CheckCircle2 className="h-5 w-5 text-success mx-auto" />
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-4 py-2 text-sm text-center">
                       {(record.employmentProvided || record.annuityProvided) ? (
                         <Badge variant="outline" className="text-xs bg-muted/30">Provided</Badge>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right font-medium">
+                    <td className="px-4 py-2 text-sm text-right font-medium">
                       {record.oneTimeAllowanceAmount ? `${record.oneTimeAllowanceAmount}` : '-'}
                     </td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-4 py-2 text-sm text-center">
                       <Badge variant={record.status === 'disbursed' ? 'success' : 'outline'} className="capitalize text-xs">
                         {record.status}
                       </Badge>

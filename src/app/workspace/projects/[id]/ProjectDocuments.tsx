@@ -146,7 +146,7 @@ export default function ProjectDocuments({ projectId, projectStatus }: { project
           Upload and manage acquisition notices, SIA reports, and final awards.
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-6 flex flex-col md:flex-row gap-8">
+      <CardContent className="p-4 sm:p-5 flex flex-col md:flex-row gap-8">
         
         {/* Upload Form */}
         <div className="w-full md:w-1/3 flex flex-col gap-4">
@@ -223,7 +223,7 @@ export default function ProjectDocuments({ projectId, projectStatus }: { project
 
       {/* Cryptographic Award Section */}
       {(projectStatus === 'award_declared' || isAwardDeclared) && (
-        <div className="border-t border-border/50 bg-muted/10 p-6">
+        <div className="border-t border-border/50 bg-muted/10 p-4 sm:p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-semibold text-lg flex items-center gap-2">

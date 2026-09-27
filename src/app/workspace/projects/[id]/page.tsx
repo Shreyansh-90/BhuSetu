@@ -127,31 +127,40 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
 
   return (
-    <div className="flex flex-col gap-8 w-full max-w-7xl mx-auto py-2">
+    <div className="flex flex-col gap-4 w-full max-w-7xl mx-auto py-2">
       
       {/* ── U6.1 Project Header Card ── */}
-      <Card className="shadow-md border-t-4 border-t-primary overflow-hidden">
-        <CardContent className="p-0">
-          <div className="p-6 md:p-8 flex flex-col gap-6">
-            
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2 flex-wrap">
-                  <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">{project.title}</h1>
-                  {getStatusBadge(project.status)}
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium mb-4">
+      <Card className="shadow-sm border rounded-none sm:rounded-lg overflow-hidden mb-2">
+        <CardContent className="p-4 sm:p-5 flex flex-col gap-3">
+          
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">{project.title}</h1>
+                {getStatusBadge(project.status)}
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-3 font-medium">
+                <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
-                  <span>District: {project.districtCode}</span>
-                  <span className="text-border mx-1">•</span>
-                  <span>State: {project.stateCode}</span>
+                  <span>{project.districtCode}, {project.stateCode}</span>
                 </div>
-                <p className="text-foreground/80 max-w-3xl leading-relaxed text-sm md:text-base">
+                <div className="flex items-center gap-1">
+                  <Building2 className="h-4 w-4" />
+                  <span className="capitalize">{project.category}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>Updated {format(new Date(project.updatedAt), 'MMM d, yyyy')}</span>
+                </div>
+              </div>
+
+              <p className="text-foreground/80 max-w-4xl text-sm leading-relaxed">
                   {project.description || 'No description provided.'}
                 </p>
               </div>
 
-              <div className="flex gap-2 shrink-0">
+              <div className="flex flex-wrap gap-2 shrink-0">
                 {project.status === 'draft' && canSubmitProposals && (
                   <>
                     <EditProjectDialog project={project} onSuccess={() => window.location.reload()} />
@@ -164,36 +173,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg border border-border/50">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Created</span>
-                  <span className="text-sm font-medium">{format(new Date(project.createdAt), 'MMM d, yyyy')}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-muted-foreground" />
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Last Updated</span>
-                  <span className="text-sm font-medium">{format(new Date(project.updatedAt), 'MMM d, yyyy')}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Building2 className="h-5 w-5 text-muted-foreground" />
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Category</span>
-                  <span className="text-sm font-medium capitalize">{project.category}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Lifecycle Stepper replaced the generic progress bar */}
-            <div className="mt-4 pt-4 border-t border-border/50">
+            {/* Lifecycle Stepper */}
+            <div className="mt-1 pt-3 border-t border-border/50">
               <LifecycleStepper currentStatus={project.status} activeTask={project.activeTask} />
             </div>
 
-          </div>
         </CardContent>
       </Card>
 
@@ -203,90 +187,88 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           
           <TabsTrigger 
             value="overview" 
-            className="rounded-none border-b-2 border-transparent py-4 px-6 font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-4 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
+            className="rounded-none border-b-2 border-transparent py-2 px-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-2 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
           >
             <Info className="h-4 w-4" /> Overview
           </TabsTrigger>
 
           <TabsTrigger 
             value="spatial" 
-            className="rounded-none border-b-2 border-transparent py-4 px-6 font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-4 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
+            className="rounded-none border-b-2 border-transparent py-2 px-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-2 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
           >
             <MapIcon className="h-4 w-4" /> Spatial & Parcels
           </TabsTrigger>
 
           <TabsTrigger 
             value="documents" 
-            className="rounded-none border-b-2 border-transparent py-4 px-6 font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-4 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
+            className="rounded-none border-b-2 border-transparent py-2 px-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-2 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
           >
             <FileText className="h-4 w-4" /> Documents
           </TabsTrigger>
 
-
-
           <TabsTrigger 
             value="financials" 
-            className="rounded-none border-b-2 border-transparent py-4 px-6 font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-4 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
+            className="rounded-none border-b-2 border-transparent py-2 px-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-2 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
           >
             <Calculator className="h-4 w-4" /> Financials & R&R
           </TabsTrigger>
 
-
-
           <TabsTrigger 
             value="timeline" 
-            className="rounded-none border-b-2 border-transparent py-4 px-6 font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-4 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
+            className="rounded-none border-b-2 border-transparent py-2 px-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border data-[state=active]:border-accent data-[state=active]:border-b-2 data-[state=active]:text-foreground data-[state=active]:font-bold data-[state=active]:shadow-none transition-all flex items-center gap-2 shrink-0"
           >
             <Clock className="h-4 w-4" /> Activity Timeline
           </TabsTrigger>
 
         </TabsList>
 
-        <div className="mt-6">
+        <div className="mt-2">
           <TabsContent value="overview" className="m-0 focus-visible:outline-none">
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               <Card className="shadow-sm border-border/50">
-                <CardHeader className="bg-muted/10 border-b border-border/50 pb-4">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Tag className="h-5 w-5 text-primary" /> Project Classification
+                <CardHeader className="bg-muted/10 border-b border-border/50 p-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-primary" /> Project Classification
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 pt-6">
-                  <div>
-                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Category</h4>
-                    <p className="capitalize font-medium text-foreground">{project.category}</p>
+                <CardContent className="space-y-4 pt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Category</h4>
+                      <p className="capitalize font-medium text-foreground text-sm">{project.category}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Estimated Area</h4>
+                      <p className="font-medium text-foreground text-sm">{project.estimatedAreaSqm ? `${project.estimatedAreaSqm.toLocaleString()} sq.m` : 'Not specified'}</p>
+                    </div>
                   </div>
                   <div>
                     <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Public Purpose</h4>
-                    <p className="font-medium text-foreground">{project.purpose}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Estimated Area</h4>
-                    <p className="font-medium text-foreground">{project.estimatedAreaSqm ? `${project.estimatedAreaSqm.toLocaleString()} sq.m` : 'Not specified'}</p>
+                    <p className="font-medium text-foreground text-sm">{project.purpose}</p>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="shadow-sm border-border/50">
-                <CardHeader className="bg-muted/10 border-b border-border/50 pb-4">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-accent" /> Location Constraints
+                <CardHeader className="bg-muted/10 border-b border-border/50 p-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-accent" /> Location Constraints
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 pt-6">
+                <CardContent className="space-y-4 pt-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">State Code</h4>
-                      <p className="font-medium text-foreground">{project.stateCode}</p>
+                      <p className="font-medium text-foreground text-sm">{project.stateCode}</p>
                     </div>
                     <div>
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">District Code</h4>
-                      <p className="font-medium text-foreground">{project.districtCode}</p>
+                      <p className="font-medium text-foreground text-sm">{project.districtCode}</p>
                     </div>
                   </div>
-                  <div className="p-4 bg-muted/20 border border-border/50 rounded-lg text-sm text-muted-foreground flex flex-col gap-2">
-                    <div className="flex items-center gap-2 font-medium text-foreground">
-                      <Info className="h-4 w-4 text-primary" /> Note
+                  <div className="p-3 bg-muted/20 border border-border/50 rounded-md text-xs text-muted-foreground flex flex-col gap-1.5">
+                    <div className="flex items-center gap-1.5 font-medium text-foreground">
+                      <Info className="h-3.5 w-3.5 text-primary" /> Note
                     </div>
                     Detailed village-level schedules and polygon data are available under the Spatial & Parcels tab once submitted.
                   </div>
@@ -309,7 +291,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
 
 
-          <TabsContent value="financials" className="m-0 focus-visible:outline-none flex flex-col gap-6">
+          <TabsContent value="financials" className="m-0 focus-visible:outline-none flex flex-col gap-4">
             <ProjectCompensation projectId={project.id} projectStatus={project.status} />
             <ProjectRehabilitation projectId={project.id} />
           </TabsContent>

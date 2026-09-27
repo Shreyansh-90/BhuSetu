@@ -32,8 +32,10 @@ async function updateParcel(request: NextRequest, { logger, params }: ApiHandler
     if (parcelRecord.projectId) {
       const project = await db.query.projects.findFirst({ where: eq(projects.id, parcelRecord.projectId) });
       if (project && user.role !== 'admin' && user.role !== 'ministry_officer') {
-        if (user.stateCode && project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
-        if (user.districtCode && project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+        if (!user.stateCode || project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
+        if (user.role !== 'state_officer') {
+          if (!user.districtCode || project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+        }
       }
     }
 

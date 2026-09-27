@@ -167,7 +167,7 @@ export default function ProjectParcels({
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
       {/* LEFT COLUMN: Map View */}
       <div className="flex flex-col gap-4">
         <Card className="shadow-sm border-border/50 flex-1 flex flex-col overflow-hidden relative">
@@ -236,7 +236,7 @@ export default function ProjectParcels({
       </CardHeader>
       <CardContent className="p-0">
         {parcels.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
+          <div className="p-4 sm:p-5 text-center text-muted-foreground">
             No parcels added to this project yet.
           </div>
         ) : (
@@ -244,29 +244,29 @@ export default function ProjectParcels({
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-muted-foreground uppercase bg-muted/20 border-b border-border/50">
                 <tr>
-                  <th className="px-6 py-4 font-semibold">Survey / Khata No.</th>
-                  <th className="px-6 py-4 font-semibold">Location</th>
-                  <th className="px-6 py-4 font-semibold">Owner</th>
-                  <th className="px-6 py-4 font-semibold text-right">Area (sq.m)</th>
-                  <th className="px-6 py-4 font-semibold">ULPIN / Bhu-Aadhaar</th>
-                  <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                  <th className="px-4 py-2 text-sm font-semibold">Survey / Khata No.</th>
+                  <th className="px-4 py-2 text-sm font-semibold">Location</th>
+                  <th className="px-4 py-2 text-sm font-semibold">Owner</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-right">Area (sq.m)</th>
+                  <th className="px-4 py-2 text-sm font-semibold">ULPIN / Bhu-Aadhaar</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 {parcels.map((parcel) => (
                   <tr key={parcel.id} className="hover:bg-muted/5 transition-colors">
-                    <td className="px-6 py-4 font-medium">{parcel.surveyNumber || 'N/A'}</td>
-                    <td className="px-6 py-4 text-muted-foreground">
+                    <td className="px-4 py-2 text-sm font-medium">{parcel.surveyNumber || 'N/A'}</td>
+                    <td className="px-4 py-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
                         {parcel.village}, {parcel.tehsil}
                       </div>
                     </td>
-                    <td className="px-6 py-4">{parcel.ownerName || 'Unknown'}</td>
-                    <td className="px-6 py-4 text-right font-medium">
+                    <td className="px-4 py-2 text-sm">{parcel.ownerName || 'Unknown'}</td>
+                    <td className="px-4 py-2 text-sm text-right font-medium">
                       {parcel.areaSqm ? parcel.areaSqm.toLocaleString() : '-'}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-2 text-sm">
                       {editingUlpin === parcel.id ? (
                         <div className="flex flex-col gap-1">
                           <Input 
@@ -292,7 +292,7 @@ export default function ProjectParcels({
                         )
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-4 py-2 text-sm text-right">
                       {editingUlpin === parcel.id ? (
                         <div className="flex items-center justify-end gap-2">
                           <Button variant="ghost" size="sm" onClick={() => { setEditingUlpin(null); setError(null); }} disabled={saving}>

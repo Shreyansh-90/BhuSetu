@@ -37,11 +37,13 @@ async function getProjectDetail(request: NextRequest, { logger, params }: ApiHan
 
   // Scope check
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) {
+    if (!user.stateCode || project.stateCode !== user.stateCode) {
       return errorResponse('FORBIDDEN', 'You do not have access to this project.');
     }
-    if (user.districtCode && project.districtCode !== user.districtCode) {
-      return errorResponse('FORBIDDEN', 'You do not have access to this project.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) {
+        return errorResponse('FORBIDDEN', 'You do not have access to this project.');
+      }
     }
   }
 
@@ -92,11 +94,13 @@ async function updateProjectDraft(request: NextRequest, { logger, params }: ApiH
 
   // Scope check
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) {
+    if (!user.stateCode || project.stateCode !== user.stateCode) {
       return errorResponse('FORBIDDEN', 'You do not have access to this project.');
     }
-    if (user.districtCode && project.districtCode !== user.districtCode) {
-      return errorResponse('FORBIDDEN', 'You do not have access to this project.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) {
+        return errorResponse('FORBIDDEN', 'You do not have access to this project.');
+      }
     }
   }
 

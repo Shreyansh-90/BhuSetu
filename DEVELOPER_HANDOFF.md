@@ -135,10 +135,12 @@ SIH26/
 - Users have optional `stateCode` and `districtCode` properties. Projects and Parcels also have these codes.
 - **Enforcement**: 
   At the API layer, whenever fetching a project or parcel, the system explicitly validates the user's scope against the retrieved entity's scope. Administrators (National) bypass this check.
+  **IMPORTANT RULE**: Missing location scopes (`NULL` stateCode or districtCode) on scoped users will securely **FAIL CLOSED** (return 403), ensuring they don't gain unrestricted global access.
   Example:
   ```ts
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) return FORBIDDEN;
+    if (!user.stateCode || project.stateCode !== user.stateCode) return FORBIDDEN;
+    if (user.role !== 'state_officer' && (!user.districtCode || project.districtCode !== user.districtCode)) return FORBIDDEN;
   }
   ```
 
@@ -153,10 +155,10 @@ SIH26/
 |---|---|---|
 | `users`, `user_profiles` | Identity and RBAC | Links to roles, state, district. |
 | `projects` | Core acquisition project. | Root node for all domain entities. |
-| `parcels` | Land parcels. | Belongs to `projects`. |
+| `parcels` | Land parcels. | Belongs to `projects`. Now includes `ulpin` (UNIQUE TEXT) for Bhu-Aadhaar tracking. |
 | `parcel_geometries` / `project_geometries` | PostGIS storage. | Maps to `parcels` and `projects`. |
 | `compensations` | Monetary evaluation. | Belongs to `parcels` and `projects`. |
-| `rehabilitation_records` | R&R beneficiaries. | Belongs to `parcels` and `projects`. |
+| `rehabilitation` | R&R beneficiaries. | Belongs to `parcels` and `projects`. |
 | `workflow_tasks` | State machine steps/SLAs. | Belongs to `projects`. |
 | `audit_events` | Immutable action ledger. | Links to any `entityId` + `metadata` JSONB. |
 
@@ -200,7 +202,7 @@ SIH26/
 ## 11. ULPIN / CITIZEN PORTAL
 
 - **Citizen Tracking**: Implemented at `src/app/citizen/track/page.tsx` and `api/v1/citizen/track/route.ts`.
-- Citizens query using the 14-digit ULPIN (Bhu-Aadhaar) or a specific Project ID.
+- Citizens query using the 14-digit ULPIN (Bhu-Aadhaar), which is now directly stored as a `UNIQUE TEXT` field in the `parcels` table.
 - **Protection**: Internal database UUIDs, exact monetary breakdowns, and workflow clarifications are explicitly stripped from the response payload to protect PII.
 
 ---
@@ -276,6 +278,12 @@ SIH26/
 ## 19. FRONTEND ARCHITECTURE
 
 The frontend was fully reconstructed to present a cohesive "Land Management Platform" instead of a generic admin template.
+
+### UI Density & Styling Standards
+The project workspace is designed to be a highly dense, enterprise-grade interface.
+- **Rule**: Avoid excessive vertical padding (`p-8`, `px-6 py-4`).
+- **Standard**: All data tables must use `px-4 py-2 text-sm` to ensure critical project data, timelines, and GIS tabs remain visible above the fold on standard desktop resolutions (1366x768 / 1920x1080).
+- **Structure**: Rely on tight `gap-4` spacing and standard border containers without visually overwhelming top-borders.
 
 ### Navigation Architecture
 
@@ -377,6 +385,13 @@ npm run start
 The project does NOT use `drizzle-kit push`. The actual Supabase PostgreSQL instance relies on `.sql` files located in `supabase/migrations/` (or run manually via Supabase dashboard).
 - Avoid manually editing schemas in `src/lib/db/schema` without pushing a corresponding `.sql` migration file, or the application will throw relations errors.
 
+**Demo Data Seeding**:
+If you need to reset the application state safely without breaking RBAC, PostGIS, or the core configuration, you can clear and re-seed the business logic data using the controlled script:
+```bash
+node scripts/seed-demo-data.mjs
+```
+*Note: Never execute arbitrary `DELETE FROM` commands manually, as foreign key constraints must be dropped in a very specific transaction order.*
+
 ---
 
 ## 24. TESTING / VERIFICATION
@@ -444,3 +459,19 @@ Automated test suites are currently limited. Verification relies on:
 - Fleshing out the Dashboard Analytics graphs.
 - Integrating Bhashini API for real-time multilingual citizen portal.
 - Migrating the current `auditEvents` metadata document storage to a dedicated schema if query loads exceed performance thresholds.
+
+---
+
+## 29. RECENT CHANGES LOG
+
+### 1. P0 Issue: Citizen Tracking API Fix (ULPIN)
+- **Problem**: The Citizen Tracking API (`/api/v1/citizen/track`) was throwing a 500 server error because the `ulpin` column existed in the Drizzle ORM schema but was missing from the live PostgreSQL database.
+- **Fix**: Added `supabase/migrations/20260927151000_add_ulpin_to_parcels.sql` to cleanly append the `ulpin TEXT UNIQUE` column without touching existing data. Seeded synthetic ULPINs for API validation, ensuring sensitive identifiers are completely isolated.
+
+### 2. P2 Issue: Geographic Scoping Vulnerability (Fail-Open Authorization)
+- **Problem**: Geographic filters (state and district constraints) inside `src/lib/api/authorize.ts` and various API routes were failing open. When `user.stateCode` or `user.districtCode` was `NULL`, it bypassed the constraint check entirely, granting unrestricted global access to scoped users (like `project_manager` or `district_officer`).
+- **Fix**: Inverted the logic across 14 API files and `requireScope` to fail closed. A missing required location scope now securely returns `403 FORBIDDEN` for all non-global roles.
+
+### 3. P2 Issue: Project Workspace UI/UX Bloat
+- **Problem**: The project workspace (`src/app/workspace/projects/[id]`) had excessive vertical padding (`p-8`, `px-6 py-4`), heavy top borders, and oversized spacing (`gap-6`) which pushed critical tabs and data tables out of the viewport (below the fold) on standard desktop displays.
+- **Fix**: Replaced heavy top borders with standard borders. Compressed paddings across all workspace components (e.g. `px-4 py-2 text-sm` on tables instead of `px-6 py-4`). Reduced generic card paddings (`p-4 sm:p-5`), tightened the lifecycle stepper, and reduced global workspace grid gaps. The workspace is now highly compact, dense, and enterprise-grade.

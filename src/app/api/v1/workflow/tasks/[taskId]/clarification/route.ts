@@ -54,11 +54,13 @@ async function addClarification(request: NextRequest, { logger, params }: ApiHan
 
   // Scope check on the underlying project
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) {
-      return errorResponse('FORBIDDEN', 'You do not have access to this workflow task.');
+    if (!user.stateCode || project.stateCode !== user.stateCode) {
+      return errorResponse('FORBIDDEN', 'You do not have access to this project.');
     }
-    if (user.districtCode && project.districtCode !== user.districtCode) {
-      return errorResponse('FORBIDDEN', 'You do not have access to this workflow task.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) {
+        return errorResponse('FORBIDDEN', 'You do not have access to this project.');
+      }
     }
   }
 

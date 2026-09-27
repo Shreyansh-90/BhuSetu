@@ -14,8 +14,18 @@ async function getDashboardMetrics(request: NextRequest, { logger }: ApiHandlerC
   // Active Projects (not draft, scoped to user)
   const projectFilters = [not(eq(projects.status, 'draft'))];
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode) projectFilters.push(eq(projects.stateCode, user.stateCode));
-    if (user.districtCode) projectFilters.push(eq(projects.districtCode, user.districtCode));
+    if (!user.stateCode) {
+      projectFilters.push(eq(projects.stateCode, 'NO_ACCESS'));
+    } else {
+      projectFilters.push(eq(projects.stateCode, user.stateCode));
+    }
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode) {
+        projectFilters.push(eq(projects.districtCode, 'NO_ACCESS'));
+      } else {
+        projectFilters.push(eq(projects.districtCode, user.districtCode));
+      }
+    }
   }
 
   // Pending Tasks

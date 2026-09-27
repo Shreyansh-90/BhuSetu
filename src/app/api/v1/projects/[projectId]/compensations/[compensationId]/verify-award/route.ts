@@ -26,8 +26,10 @@ async function verifyAwardDocument(request: NextRequest, { logger, params }: Api
 
   // Check RBAC/Multitenancy scope
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
-    if (user.districtCode && project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (!user.stateCode || project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    }
   }
 
   const compensation = await db.query.compensations.findFirst({

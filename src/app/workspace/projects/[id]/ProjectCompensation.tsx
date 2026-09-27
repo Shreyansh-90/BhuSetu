@@ -116,7 +116,7 @@ export default function ProjectCompensation({ projectId, projectStatus }: { proj
           </div>
         )}
         {compensations.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
+          <div className="p-4 sm:p-5 text-center text-muted-foreground">
             No land parcels added to this project. Cannot calculate compensation.
           </div>
         ) : (
@@ -124,24 +124,24 @@ export default function ProjectCompensation({ projectId, projectStatus }: { proj
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-muted-foreground uppercase bg-muted/20 border-b border-border/50">
                 <tr>
-                  <th className="px-6 py-4 font-semibold">Parcel Owner</th>
-                  <th className="px-6 py-4 font-semibold text-right">Base Value (₹)</th>
-                  <th className="px-6 py-4 font-semibold text-right">Multiplier</th>
-                  <th className="px-6 py-4 font-semibold text-right">Solatium (₹)</th>
-                  <th className="px-6 py-4 font-semibold text-right text-primary">Total Award (₹)</th>
-                  <th className="px-6 py-4 font-semibold text-center">Status</th>
+                  <th className="px-4 py-2 text-sm font-semibold">Parcel Owner</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-right">Base Value (₹)</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-right">Multiplier</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-right">Solatium (₹)</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-right text-primary">Total Award (₹)</th>
+                  <th className="px-4 py-2 text-sm font-semibold text-center">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 {compensations.map((comp) => (
                   <tr key={comp.id} className="hover:bg-muted/5 transition-colors">
-                    <td className="px-6 py-4 font-medium">
+                    <td className="px-4 py-2 text-sm font-medium">
                       {comp.parcel?.ownerName || 'Unknown'}
                       <div className="text-xs text-muted-foreground mt-0.5">
                         Area: {comp.parcel?.areaSqm || 0} sq.m
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-4 py-2 text-sm text-right">
                       {comp.status === 'draft' && !isAwardDeclared && canSubmitProposals ? (
                         <Input 
                           type="number" 
@@ -157,7 +157,7 @@ export default function ProjectCompensation({ projectId, projectStatus }: { proj
                         comp.baseMarketValue.toLocaleString()
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right font-mono">
+                    <td className="px-4 py-2 text-sm text-right font-mono">
                       {comp.status === 'draft' && !isAwardDeclared && canSubmitProposals ? (
                         <Input 
                           type="number" 
@@ -173,9 +173,9 @@ export default function ProjectCompensation({ projectId, projectStatus }: { proj
                         `${comp.multiplicationFactor.toFixed(1)}x`
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right text-muted-foreground">{comp.solatiumAmount.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-right font-bold text-primary">{comp.totalAwardAmount.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-center flex flex-col gap-2 items-center">
+                    <td className="px-4 py-2 text-sm text-right text-muted-foreground">{comp.solatiumAmount.toLocaleString()}</td>
+                    <td className="px-4 py-2 text-sm text-right font-bold text-primary">{comp.totalAwardAmount.toLocaleString()}</td>
+                    <td className="px-4 py-2 text-sm text-center flex flex-col gap-2 items-center">
                       {comp.status === 'draft' ? (
                         <>
                           <Badge variant="outline" className="text-xs">Draft Estimate</Badge>

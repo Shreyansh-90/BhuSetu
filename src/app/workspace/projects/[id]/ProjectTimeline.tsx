@@ -57,7 +57,7 @@ export default function ProjectTimeline({ projectId }: { projectId: string }) {
         <CardTitle>Activity Audit Trail</CardTitle>
         <CardDescription>Immutable log of workflow changes and approvals.</CardDescription>
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-5">
         {loading ? (
           <div className="flex justify-center p-8 text-muted-foreground" role="status" aria-live="polite">
             <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>

@@ -15,7 +15,7 @@ export function LifecycleStepper({ currentStatus, activeTask }: { currentStatus:
   const safeIndex = currentIndex === -1 ? 0 : currentIndex;
 
   return (
-    <div className="w-full py-4 overflow-x-auto hide-scrollbar">
+    <div className="w-full py-2 overflow-x-auto hide-scrollbar">
       <div className="flex items-center min-w-[800px] justify-between relative px-2">
         {/* Background Line */}
         <div className="absolute left-[5%] right-[5%] top-1/2 -translate-y-1/2 h-0.5 bg-muted"></div>

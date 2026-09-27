@@ -35,8 +35,10 @@ async function getProjectSpatial(request: NextRequest, { logger, params }: ApiHa
   }
 
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
-    if (user.districtCode && project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (!user.stateCode || project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    }
   }
 
   // Fetch project geometry as GeoJSON
@@ -111,8 +113,10 @@ async function createProjectSpatial(request: NextRequest, { logger, params }: Ap
   if (project.status !== 'draft') return errorResponse('CONFLICT', 'GIS data can only be modified in draft state.');
 
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
-    if (user.districtCode && project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (!user.stateCode || project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    }
   }
 
   try {

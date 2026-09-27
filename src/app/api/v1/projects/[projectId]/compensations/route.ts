@@ -25,8 +25,10 @@ async function getProjectCompensations(request: NextRequest, { logger, params }:
   if (!project) return errorResponse('NOT_FOUND', 'Project not found.');
 
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
-    if (user.districtCode && project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (!user.stateCode || project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    }
   }
 
   // Fetch all parcels for the project
@@ -91,8 +93,10 @@ async function saveCompensation(request: NextRequest, { logger, params }: ApiHan
   }
 
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
-    if (user.districtCode && project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (!user.stateCode || project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    }
   }
 
   const body = await request.json();

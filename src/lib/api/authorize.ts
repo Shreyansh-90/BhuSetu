@@ -97,9 +97,9 @@ export function requireScope(
     return null;
   }
 
-  // State-level check
-  if (resource.stateCode && user.stateCode) {
-    if (user.stateCode !== resource.stateCode) {
+  // All other roles MUST have a stateCode to access state-scoped resources.
+  if (resource.stateCode) {
+    if (!user.stateCode || user.stateCode !== resource.stateCode) {
       return errorResponse(
         'FORBIDDEN',
         'You do not have access to resources in this state.',
@@ -108,12 +108,16 @@ export function requireScope(
   }
 
   // District-level check (for district_officer, field_officer, etc.)
-  if (resource.districtCode && user.districtCode) {
-    if (user.districtCode !== resource.districtCode) {
-      return errorResponse(
-        'FORBIDDEN',
-        'You do not have access to resources in this district.',
-      );
+  const isStateOnlyRole = user.role === 'state_officer';
+  
+  if (resource.districtCode) {
+    if (!isStateOnlyRole) {
+      if (!user.districtCode || user.districtCode !== resource.districtCode) {
+        return errorResponse(
+          'FORBIDDEN',
+          'You do not have access to resources in this district.',
+        );
+      }
     }
   }
 

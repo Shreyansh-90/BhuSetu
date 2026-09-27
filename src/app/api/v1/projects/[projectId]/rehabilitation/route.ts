@@ -24,8 +24,10 @@ async function getRehabilitation(request: NextRequest, { logger, params }: ApiHa
   if (!project) return errorResponse('NOT_FOUND', 'Project not found.');
 
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
-    if (user.districtCode && project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (!user.stateCode || project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    }
   }
 
   const rows = await db.select().from(rehabilitation).where(eq(rehabilitation.projectId, projectId));
@@ -57,8 +59,10 @@ async function createRehabilitation(request: NextRequest, { logger, params }: Ap
   if (!project) return errorResponse('NOT_FOUND', 'Project not found.');
 
   if (user.role !== 'admin' && user.role !== 'ministry_officer') {
-    if (user.stateCode && project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
-    if (user.districtCode && project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (!user.stateCode || project.stateCode !== user.stateCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    if (user.role !== 'state_officer') {
+      if (!user.districtCode || project.districtCode !== user.districtCode) return errorResponse('FORBIDDEN', 'Access denied.');
+    }
   }
 
   try {
